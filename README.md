@@ -4,5 +4,5 @@
 Android App
 
 #目前功能
--查询图书，数据来源:http://smjslib.jmu.cn
--收藏图书
+* 查询图书，数据来源:http://smjslib.jmu.cn
+* 收藏图书
