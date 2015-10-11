@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single"
+        android:id="@+id/menu_group_function">
+        <item
+            android:id="@+id/menu_drawer_main"
+            android:checked="true"
+            android:icon="@drawable/ic_account_balance_green_24dp"
+            android:title="@string/menu_drawer_main" />
+        <item
+            android:id="@+id/menu_drawer_status"
+            android:checked="true"
+            android:icon="@drawable/ic_schedule_amber_24dp"
+            android:title="@string/menu_drawer_status" />
+        <item
+            android:id="@+id/menu_drawer_bookslist"
+            android:checked="true"
+            android:icon="@drawable/ic_loyalty_red_24dp"
+            android:title="@string/menu_drawer_bookslist" />
+    </group>
+    <item
+        android:id="@+id/sub_menu"
+        android:title="@string/main_drawre_other">
+        <menu>
+            <item
+                android:id="@+id/menu_drawer_settings"
+                android:checked="true"
+                android:icon="@drawable/ic_settings_white_24dp"
+                android:title="@string/menu_drawer_settings" />
+            <item
+                android:id="@+id/menu_drawer_feedback"
+                android:checked="true"
+                android:icon="@drawable/ic_bug_report_purple_24dp"
+                android:title="@string/menu_drawer_feedback" />
+        </menu>
+    </item>
+</menu>

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="@dimen/layout_padding">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="10dp"
+        app:cardBackgroundColor="@android:color/white"
+        app:cardElevation="2dp">
+        <!-- Dummy item to prevent AutoCompleteTextView from receiving focus -->
+        <LinearLayout
+            android:layout_width="0px"
+            android:layout_height="0px"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
+
+            <!-- :nextFocusUp and :nextFocusLeft have been set to the id of this component
+                 to prevent the dummy from receiving focus again -->
+            <AutoCompleteTextView
+                android:id="@+id/autotext"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:nextFocusLeft="@id/autotext"
+                android:nextFocusUp="@id/autotext" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="5dp"
+            android:background="@drawable/ic_search_green_24dp"
+            android:contentDescription="search_icon" />
+
+        <EditText
+            android:id="@+id/search_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="40dp"
+            android:background="@null"
+            android:hint="输入搜索关键字"
+            android:imeOptions="actionSearch"
+            android:singleLine="true"
+            android:textColor="#718485"
+            android:textColorHint="#A6BBBC" />
+    </android.support.v7.widget.CardView>
+
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="10dp"
+        android:background="@android:color/white"
+        app:cardBackgroundColor="@android:color/white"
+        app:cardElevation="2dp">
+
+        <ImageView
+            android:id="@+id/img_user_unlogged"
+            android:layout_width="wrap_content"
+            android:layout_height="130dp"
+            android:background="@drawable/img_index_unlogged_hint" />
+    </android.support.v7.widget.CardView>
+
+    <RelativeLayout
+        android:id="@+id/index_tag_notification"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:text="热门搜索"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/mainPrimaryColor" />
+
+    </RelativeLayout>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:columnCount="1"
+        android:orientation="horizontal"
+        android:rowCount="3">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_column="0">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardElevation="2dp">
+
+                <TextView
+                    android:id="@+id/test"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="@dimen/layout_padding"
+                    android:text="java"
+                    android:textAllCaps="true"
+                    android:textColor="@color/mainPrimaryColor" />
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardElevation="2dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="@dimen/layout_padding"
+                    android:text="高等数学"
+                    android:textAllCaps="true"
+                    android:textColor="@color/mainPrimaryColor" />
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_column="0">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardElevation="2dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="@dimen/layout_padding"
+                    android:text="matlab"
+                    android:textAllCaps="true"
+                    android:textColor="@color/mainPrimaryColor" />
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardElevation="2dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="@dimen/layout_padding"
+                    android:text="金瓶梅"
+                    android:textAllCaps="true"
+                    android:textColor="@color/mainPrimaryColor" />
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_column="0">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardElevation="2dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="@dimen/layout_padding"
+                    android:text="android"
+                    android:textAllCaps="true"
+                    android:textColor="@color/mainPrimaryColor" />
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardElevation="2dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="@dimen/layout_padding"
+                    android:text="平凡的世界"
+                    android:textAllCaps="true"
+                    android:textColor="@color/mainPrimaryColor" />
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
+    </GridLayout>
+
+</LinearLayout>

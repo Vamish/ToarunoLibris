@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">愚者の图书馆</string>
+    <string name="title_activity_search">SearchActivity</string>
+    <string name="title_activity_book_result">BookResultActivity</string>
+    <string name="title_activity_books_list">我的书单</string>
+    <string name="title_activity_feed_back">反馈</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_search">搜索</string>
+
+    <string name="drawer_open">open</string>
+    <string name="drawer_close">close</string>
+    <string name="drawer_list_index">首页</string>
+    <string name="drawer_list_status">借阅状态</string>
+    <string name="drawer_list_mylist">我的书单</string>
+    <string name="drawer_list_settings">设置</string>
+    <string name="drawer_list_feedback">反馈</string>
+    <string name="menu_drawer_main">首页</string>
+    <string name="menu_drawer_status">借阅状态</string>
+    <string name="menu_drawer_bookslist">我的书单</string>
+    <string name="main_drawre_other">其他</string>
+    <string name="menu_drawer_settings">设置</string>
+    <string name="menu_drawer_feedback">反馈</string>
+    <string name="title_activity_book_info">BookInfoActivity</string>
+
+    <string name="placeholder_subtitle">次标题</string>
+    <string name="placeholder_title">主标题</string>
+    <string name="action_share">分享</string>
+
+    <!--LoginActivity STRING-->
+    <string name="login_announcement">登录声明</string>
+    <string name="login_username_hint">锐捷账号</string>
+    <string name="login_password_hint">密码</string>
+    <string name="title_activity_login">登录</string>
+    <string name="feedback_btn">发送</string>
+    <string name="title_activity_test">TestActivity</string>
+    <string name="action_delete">删除书单</string>
+
+    <string-array name="search_function">
+        <item>分享</item>
+        <item>收藏到书单</item>
+    </string-array>
+    <string-array name="bookslist_function">
+        <item>分享</item>
+        <item>删除</item>
+    </string-array>
+</resources>

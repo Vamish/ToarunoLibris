@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="130dp"
+    android:background="@drawable/bg"
+    android:gravity="center"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginRight="16dp"
+            android:src="@drawable/ic_account_circle_white_24dp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingBottom="2dp"
+            android:paddingRight="25dp">
+
+            <TextView
+                android:id="@+id/drawer_user_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="某某某"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/drawer_user_collage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="计算机工程学院"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="normal" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

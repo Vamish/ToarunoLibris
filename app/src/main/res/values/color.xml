@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="mainPrimaryColorLight">#C8E6C9</color>
+    <color name="mainPrimaryColor">#4CAF50</color>
+    <color name="mainPrimaryColorDark">#388E3C</color>
+    <color name="mainAccentColor">#FFC107</color>
+    <color name="mainPrimaryTextColor">#212121</color>
+    <color name="mainSecondaryTextColor">#727272</color>
+    <color name="mainDividerColor">#B6B6B6</color>
+    <color name="mainHighLightColor">#EEEEEE</color>
+    <!--<color name="mainPrimaryColorLight">#B2EBF2</color>-->
+    <!--<color name="mainPrimaryColor">#00BCD4</color>-->
+    <!--<color name="mainPrimaryColorDark">#0097A7</color>-->
+    <!--<color name="mainAccentColor">#FF9800</color>-->
+    <!--<color name="mainPrimaryTextColor">#212121</color>-->
+    <!--<color name="mainSecondaryTextColor">#727272</color>-->
+    <!--<color name="mainDividerColor">#B6B6B6</color>-->
+    <!--<color name="mainHighLightColor">#EEEEEE</color>-->
+
+    <color name="refreshFourColors1">#26C6DA</color>
+    <color name="refreshFourColors2">#EC407A</color>
+    <color name="refreshFourColors3">#42A5F5</color>
+    <color name="refreshFourColors4">#FFCA28</color>
+</resources>
