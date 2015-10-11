@@ -36,10 +36,15 @@
     <string name="feedback_btn">发送</string>
     <string name="title_activity_test">TestActivity</string>
     <string name="action_delete">删除书单</string>
+    <string name="action_share_all">分享全部</string>
 
     <string-array name="search_function">
         <item>分享</item>
         <item>收藏到书单</item>
+    </string-array>
+    <string-array name="search_function_done">
+        <item>分享</item>
+        <item>已添加到书单</item>
     </string-array>
     <string-array name="bookslist_function">
         <item>分享</item>

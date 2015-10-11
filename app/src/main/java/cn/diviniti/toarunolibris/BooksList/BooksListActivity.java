@@ -40,8 +40,6 @@ public class BooksListActivity extends AppCompatActivity implements SwipeBackAct
     private BookListDAO bookListDAO;
     private SwipeRefreshLayout swipeRefreshLayout;
 
-
-    private SwipeBackLayout swipeBackLayout;
     private SwipeBackActivityHelper mHelper;
 
     @Override
@@ -151,12 +149,9 @@ public class BooksListActivity extends AppCompatActivity implements SwipeBackAct
                             public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
                                 switch (which) {
                                     case 0:
-                                        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                                        String shareText = "索书号: " + bookCallNumber + "\n" +
-                                                "书名: " + bookName;
-                                        ClipData clip = ClipData.newPlainText("simple text", shareText);
-                                        clipboard.setPrimaryClip(clip);
-                                        Toast.makeText(getApplicationContext(), "已复制到剪贴板", Toast.LENGTH_SHORT).show();
+                                        String shareString = "索书号：" + bookCallNumber + "\n" +
+                                                "书名：" + bookName;
+                                        shareBook(BooksListActivity.this, shareString);
                                         break;
                                     case 1:
                                         new MaterialDialog.Builder(BooksListActivity.this)
@@ -246,7 +241,6 @@ public class BooksListActivity extends AppCompatActivity implements SwipeBackAct
             return true;
         }
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_delete_all) {
             new MaterialDialog.Builder(BooksListActivity.this)
                     .title("删除确认")
@@ -270,6 +264,24 @@ public class BooksListActivity extends AppCompatActivity implements SwipeBackAct
                     })
                     .show();
             return true;
+        }
+
+        if (id == R.id.action_share_all) {
+            List<BookSummary> bookSummaryList = bookListDAO.findBooks();
+
+            if (bookSummaryList != null) {
+                String shareString = "";
+                for (BookSummary book : bookSummaryList) {
+                    shareString += "索书号：" + book.bookCallNumber
+                            + "\n"
+                            + "书名："
+                            + book.bookName
+                            + "\n\n";
+                }
+                shareBook(BooksListActivity.this, shareString);
+            } else {
+                Toast.makeText(getApplicationContext(), "书单里面没有图书可以分享", Toast.LENGTH_SHORT).show();
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -328,6 +340,15 @@ public class BooksListActivity extends AppCompatActivity implements SwipeBackAct
         void onClick(View view, int position);
 
         void onLongClick(View view, int position);
+    }
+
+    public void shareBook(Context context, String shareText) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "分享图书信息");
+        intent.putExtra(Intent.EXTRA_TEXT, shareText);
+        intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        context.startActivity(Intent.createChooser(intent, "分享"));
     }
 
     private void initSwipeBack() {

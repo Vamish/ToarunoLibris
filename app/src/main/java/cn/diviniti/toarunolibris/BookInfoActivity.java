@@ -210,23 +210,22 @@ public class BookInfoActivity extends AppCompatActivity implements SwipeBackActi
             onBackPressed();
             return true;
         }
-        switch (item.getItemId()) {
-            case R.id.action_share:
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                String shareBookName = "";
-                if (BOOK_NAME.length() > 15) {
-                    shareBookName = BOOK_NAME.substring(0, 12) + "...";
-                } else {
-                    shareBookName = BOOK_NAME;
-                }
-                String shareText = "索书号: " + BOOK_CALL_NUMBER + "\n" +
-                        "书名: " + shareBookName;
-                ClipData clip = ClipData.newPlainText("simple text", shareText);
-                clipboard.setPrimaryClip(clip);
-                Snackbar.make(coordinatorLayout, "已复制到剪贴板", Snackbar.LENGTH_SHORT).show();
-                break;
+        if (item.getItemId() == R.id.action_share) {
+            shareBook(BookInfoActivity.this, BOOK_CALL_NUMBER, BOOK_NAME);
+            return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void shareBook(Context context, String bookCallNum, String bookName) {
+        String shareString = "索书号：" + bookCallNum + "\n" +
+                "书名：" + bookName;
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "分享图书信息");
+        intent.putExtra(Intent.EXTRA_TEXT, shareString);
+        intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        context.startActivity(Intent.createChooser(intent, "分享"));
     }
 
     public void getAvailableMsg() {

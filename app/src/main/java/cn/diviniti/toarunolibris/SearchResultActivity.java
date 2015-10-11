@@ -63,7 +63,6 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
     private SwipeRefreshLayout swipeRefreshLayout;
     private ImageView imageHolderForException;
 
-    private SwipeBackLayout swipeBackLayout;
     private SwipeBackActivityHelper mHelper;
 
     private BookListDAO bookListDAO;
@@ -148,12 +147,7 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
                                 public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
                                     switch (which) {
                                         case 0:
-                                            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                                            String shareText = "索书号: " + bookCallNumber + "\n" +
-                                                    "书名: " + bookName;
-                                            ClipData clip = ClipData.newPlainText("simple text", shareText);
-                                            clipboard.setPrimaryClip(clip);
-                                            Toast.makeText(getApplicationContext(), "已复制到剪贴板", Toast.LENGTH_SHORT).show();
+                                            shareBook(SearchResultActivity.this, bookCallNumber, bookName);
                                             break;
                                         case 1:
                                             bookListDAO.insertBook(bookID, bookName, bookAuthor, bookPublisher, bookCallNumber);
@@ -165,8 +159,18 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
                             .show();
                 } else {
                     new MaterialDialog.Builder(SearchResultActivity.this)
-                            .content("已添加到书单了")
-                            .positiveText("知道了")
+                            .title("选择功能")
+                            .items(R.array.search_function_done)
+                            .itemsCallback(new MaterialDialog.ListCallback() {
+                                @Override
+                                public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                    switch (which) {
+                                        case 0:
+                                            shareBook(SearchResultActivity.this, bookCallNumber, bookName);
+                                            break;
+                                    }
+                                }
+                            })
                             .show();
                 }
             }
@@ -201,6 +205,17 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
             }
         });
         imageHolderForException = (ImageView) findViewById(R.id.img_book_not_found);
+    }
+
+    public void shareBook(Context context, String bookCallNum, String bookName) {
+        String shareString = "索书号：" + bookCallNum + "\n" +
+                "书名：" + bookName;
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "分享图书信息");
+        intent.putExtra(Intent.EXTRA_TEXT, shareString);
+        intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        context.startActivity(Intent.createChooser(intent, "分享"));
     }
 
     @Override
