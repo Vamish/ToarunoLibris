@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.quinny898.library.persistentsearch.SearchBox;
+import com.quinny898.library.persistentsearch.SearchResult;
 
 import org.apache.http.HttpHeaders;
 import org.jsoup.Jsoup;
@@ -53,6 +54,8 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
     private final static int BOOKS_LIST_LOADING = 0x000003;
     private final static int BOOKS_LIST_LOADED = 0x000004;
 
+    private Toolbar toolbar;
+
     private String searchKeyWords;
     private RecyclerView booksListView;
     private static BookSummaryAdapter adapter;
@@ -78,12 +81,19 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
         }
 
         //  Toolbar初始化
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         assert getSupportActionBar() != null;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setTitle(searchKeyWords.toUpperCase());
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                openSearch();
+                return false;
+            }
+        });
 
         initSwipeBack();
 
@@ -110,12 +120,6 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
                 String bookAuthor = bookAuthorView.getText().toString();
                 String bookPublisher = bookPublisherView.getText().toString();
                 String bookCallNumber = bookCallNumberView.getText().toString();
-//                String show = "ID:" + bookID + "\n" +
-//                        "Name:" + bookName + "\n" +
-//                        "Author:" + bookAuthor + "\n" +
-//                        "Publisher:" + bookPublisher + "\n" +
-//                        "CallNumber:" + bookCallNumber;
-//                Toast.makeText(getApplicationContext(), "click:" + show, Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(getApplicationContext(), BookInfoActivity.class)
                         .putExtra("bookID", bookID)
                         .putExtra("bookName", bookName)
@@ -200,11 +204,71 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                swipeRefreshLayout.setRefreshing(false);
-                Toast.makeText(getApplicationContext(), "是最新内容了", Toast.LENGTH_SHORT).show();
+                if (swipeRefreshLayout.isRefreshing()) {
+                    swipeRefreshLayout.setRefreshing(false);
+                    Toast.makeText(getApplicationContext(), "是最新内容了", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         imageHolderForException = (ImageView) findViewById(R.id.img_book_not_found);
+    }
+
+    private void openSearch() {
+        searchBox = (SearchBox) findViewById(R.id.searchbox);
+        // TODO 这里要用sqlite数据代替
+        for (int i = 0; i < 5; i++) {
+            SearchResult option = new SearchResult("TestResult " + Integer.toString(i), getResources().getDrawable(R.drawable.ic_history_grey_24dp));
+            searchBox.addSearchable(option);
+        }
+        searchBox.setMenuListener(new SearchBox.MenuListener() {
+            @Override
+            public void onMenuClick() {
+                searchBox.hideCircularlyToMenuItem(R.id.action_search, SearchResultActivity.this);
+            }
+        });
+        searchBox.setSearchListener(new SearchBox.SearchListener() {
+            @Override
+            public void onSearchOpened() {
+
+            }
+
+            @Override
+            public void onSearchCleared() {
+
+            }
+
+            @Override
+            public void onSearchClosed() {
+                searchBox.hideCircularlyToMenuItem(R.id.action_search_reveal, SearchResultActivity.this);
+            }
+
+            @Override
+            public void onSearchTermChanged(String s) {
+
+            }
+
+            @Override
+            public void onSearch(String searchKeyWord) {
+                toolbar.setTitle(searchKeyWord.toUpperCase());
+                searchBox.hideCircularlyToMenuItem(R.id.action_search, SearchResultActivity.this);
+                swipeRefreshLayout.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeRefreshLayout.setRefreshing(true);
+                    }
+                });
+                adapter = new BookSummaryAdapter(getApplicationContext(), getPageBooksListData(searchKeyWord, currentPage));
+                booksListView.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onResultClick(SearchResult searchResult) {
+                onSearch(searchResult.title);
+            }
+        });
+
+        searchBox.revealFromMenuItem(R.id.action_search, this);
     }
 
     public void shareBook(Context context, String bookCallNum, String bookName) {

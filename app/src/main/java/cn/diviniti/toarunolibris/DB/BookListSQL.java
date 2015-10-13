@@ -11,7 +11,14 @@ public class BookListSQL extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table booksList (book_id nchar(10) primary key,book_name nchar(20),book_author nchar(10),book_publisher nchar(20),book_call_number nchar(20))");
+        db.execSQL("create table booksList (" +
+                "book_id nchar(10) primary key," +
+                "book_name nchar(20)," +
+                "book_author nchar(10)," +
+                "book_publisher nchar(20)," +
+                "book_call_number nchar(20)," +
+                "book_available nchar(20)" +
+                ")");
     }
 
     @Override
