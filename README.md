@@ -11,3 +11,7 @@ Android App
 
 ## 待增功能
 * 查询借书状态
+
+## 目前问题
+* SearchResultActivity内再搜索时搜索框出现问题
+* 保存图书到本地数据库时发生错误
