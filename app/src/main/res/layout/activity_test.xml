@@ -1,11 +1,18 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="cn.diviniti.toarunolibris.test.TestActivity">
 
+
     <include
-        android:id="@id/toolbar"
+        android:id="@+id/toolbar"
         layout="@layout/layout_toolbar" />
 
-</LinearLayout>
+    <com.quinny898.library.persistentsearch.SearchBox
+        android:id="@+id/searchbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="22dp"
+        android:visibility="gone" />
+</RelativeLayout>

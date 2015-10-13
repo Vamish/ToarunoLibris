@@ -1,13 +1,10 @@
 package cn.diviniti.toarunolibris;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.quinny898.library.persistentsearch.SearchBox;
 
 import org.apache.http.HttpHeaders;
 import org.jsoup.Jsoup;
@@ -64,6 +62,8 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
     private ImageView imageHolderForException;
 
     private SwipeBackActivityHelper mHelper;
+
+    private SearchBox searchBox;
 
     private BookListDAO bookListDAO;
     private int currentPage = 1;

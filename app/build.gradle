@@ -22,6 +22,7 @@ android {
 }
 repositories {
     maven { url "https://jitpack.io" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 }
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -37,4 +38,5 @@ dependencies {
     compile('com.afollestad.material-dialogs:core:0.8.1.0@aar') {
         transitive = true
     }
+    compile 'com.quinny898.library.persistentsearch:library:1.1.0-SNAPSHOT'
 }

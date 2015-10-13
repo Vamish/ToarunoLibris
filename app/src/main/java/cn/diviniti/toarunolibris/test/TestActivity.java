@@ -6,29 +6,110 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
+
+import com.quinny898.library.persistentsearch.SearchBox;
+import com.quinny898.library.persistentsearch.SearchResult;
 
 import cn.diviniti.toarunolibris.R;
 import me.imid.swipebacklayout.lib.SwipeBackLayout;
 import me.imid.swipebacklayout.lib.Utils;
-import me.imid.swipebacklayout.lib.app.SwipeBackActivity;
 import me.imid.swipebacklayout.lib.app.SwipeBackActivityBase;
 import me.imid.swipebacklayout.lib.app.SwipeBackActivityHelper;
 
 public class TestActivity extends AppCompatActivity implements SwipeBackActivityBase {
 
-    private SwipeBackLayout swipeBackLayout;
     private SwipeBackActivityHelper mHelper;
+
+    private Toolbar toolbar;
+    private SearchBox searchBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         assert getSupportActionBar() != null;
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                initSearch();
+                openSearch();
+                return true;
+            }
+        });
         initSwipeBack();
+    }
+
+    private void openSearch() {
+        searchBox.revealFromMenuItem(R.id.action_search_reveal, TestActivity.this);
+    }
+
+    private void initSearch() {
+        searchBox = (SearchBox) findViewById(R.id.searchbox);
+        for (int i = 0; i < 10; i++) {
+            SearchResult option = new SearchResult("Result " + Integer.toString(i), getResources().getDrawable(R.drawable.ic_history_grey_24dp));
+            searchBox.addSearchable(option);
+        }
+        searchBox.setMenuListener(new SearchBox.MenuListener() {
+            @Override
+            public void onMenuClick() {
+                Toast.makeText(getApplicationContext(), "Menu Clicked!", Toast.LENGTH_SHORT).show();
+            }
+        });
+        searchBox.setSearchListener(new SearchBox.SearchListener() {
+            @Override
+            public void onSearchOpened() {
+                Toast.makeText(getApplicationContext(), "Search Opened!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSearchCleared() {
+                Toast.makeText(getApplicationContext(), "Search Cleared!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSearchClosed() {
+                searchBox.hideCircularlyToMenuItem(R.id.action_search_reveal, TestActivity.this);
+                Toast.makeText(getApplicationContext(), "Search Closed!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSearchTermChanged(String s) {
+
+            }
+
+            @Override
+            public void onSearch(String s) {
+                Toast.makeText(getApplicationContext(), "Search:" + s, Toast.LENGTH_SHORT).show();
+                searchBox.hideCircularlyToMenuItem(R.id.action_search_reveal, TestActivity.this);
+                toolbar.setTitle(s);
+            }
+
+            @Override
+            public void onResultClick(SearchResult searchResult) {
+                Toast.makeText(getApplicationContext(), "Clicked:" + searchResult.title, Toast.LENGTH_SHORT).show();
+                onSearch(searchResult.title);
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_test, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_search_reveal) {
+            Toast.makeText(getApplicationContext(), "ACTION_SEARCH_CLICKED", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void initSwipeBack() {

@@ -30,7 +30,7 @@
                 android:id="@+id/books_result"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:fadeScrollbars="true"/>
+                android:fadeScrollbars="true" />
 
         </RelativeLayout>
     </android.support.v4.widget.SwipeRefreshLayout>

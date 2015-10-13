@@ -39,6 +39,7 @@ public class BookSummaryAdapter extends RecyclerView.Adapter<BookSummaryAdapter.
         holder.bookCallNumber.setText(currentBook.bookCallNumber);
         holder.bookAuthor.setText(currentBook.bookAuthor);
         holder.bookPublisher.setText(currentBook.bookPublisher);
+        holder.bookAvailable.setText("可借: " + currentBook.bookAvailable);
     }
 
     @Override
@@ -52,6 +53,7 @@ public class BookSummaryAdapter extends RecyclerView.Adapter<BookSummaryAdapter.
         TextView bookCallNumber;
         TextView bookAuthor;
         TextView bookPublisher;
+        TextView bookAvailable;
 
         public BooksViewHolder(View itemView) {
             super(itemView);
@@ -60,6 +62,7 @@ public class BookSummaryAdapter extends RecyclerView.Adapter<BookSummaryAdapter.
             bookCallNumber = (TextView) itemView.findViewById(R.id.book_call_number);
             bookAuthor = (TextView) itemView.findViewById(R.id.book_author);
             bookPublisher = (TextView) itemView.findViewById(R.id.book_publisher);
+            bookAvailable = (TextView) itemView.findViewById(R.id.book_available);
         }
     }
 }
