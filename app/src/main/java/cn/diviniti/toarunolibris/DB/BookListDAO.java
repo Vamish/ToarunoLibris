@@ -57,7 +57,6 @@ public class BookListDAO {
     public List<BookSummary> findBooks() {
         SQLiteDatabase db = sql.getReadableDatabase();
         Cursor data = db.rawQuery("select * from booksList", null);
-        db.close();
         List<BookSummary> booksList = new ArrayList<>();
 
         if (data.getCount() > 0) {
