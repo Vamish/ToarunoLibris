@@ -6,11 +6,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
 
+import java.util.ArrayList;
+
+import cn.diviniti.toarunolibris.DB.SearchHistoryDAO;
 import cn.diviniti.toarunolibris.R;
 import me.imid.swipebacklayout.lib.SwipeBackLayout;
 import me.imid.swipebacklayout.lib.Utils;
@@ -20,7 +24,7 @@ import me.imid.swipebacklayout.lib.app.SwipeBackActivityHelper;
 public class TestActivity extends AppCompatActivity implements SwipeBackActivityBase {
 
     private SwipeBackActivityHelper mHelper;
-
+    private SearchHistoryDAO searchHistoryDAO;
     private Toolbar toolbar;
     private SearchBox searchBox;
 
@@ -33,6 +37,7 @@ public class TestActivity extends AppCompatActivity implements SwipeBackActivity
         assert getSupportActionBar() != null;
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        searchHistoryDAO = new SearchHistoryDAO(getApplicationContext());
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -42,6 +47,18 @@ public class TestActivity extends AppCompatActivity implements SwipeBackActivity
             }
         });
         initSwipeBack();
+        initDelete();
+    }
+
+    private void initDelete() {
+        Button btn = (Button) findViewById(R.id.delete_history);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(TestActivity.this, "点了", Toast.LENGTH_SHORT).show();
+                searchHistoryDAO.deleteHistory();
+            }
+        });
     }
 
     private void openSearch() {
@@ -50,10 +67,7 @@ public class TestActivity extends AppCompatActivity implements SwipeBackActivity
 
     private void initSearch() {
         searchBox = (SearchBox) findViewById(R.id.searchbox);
-        for (int i = 0; i < 10; i++) {
-            SearchResult option = new SearchResult("Result " + Integer.toString(i), getResources().getDrawable(R.drawable.ic_history_grey_24dp));
-            searchBox.addSearchable(option);
-        }
+
         searchBox.setMenuListener(new SearchBox.MenuListener() {
             @Override
             public void onMenuClick() {
@@ -63,6 +77,13 @@ public class TestActivity extends AppCompatActivity implements SwipeBackActivity
         searchBox.setSearchListener(new SearchBox.SearchListener() {
             @Override
             public void onSearchOpened() {
+                if (searchHistoryDAO.hasHistory()) {
+                    ArrayList<String> histories = searchHistoryDAO.getHistory();
+                    for (int i = 0; i < histories.size(); i++) {
+                        SearchResult history = new SearchResult(histories.get(i), getResources().getDrawable(R.drawable.ic_history_grey_24dp));
+                        searchBox.addSearchable(history);
+                    }
+                }
                 Toast.makeText(getApplicationContext(), "Search Opened!", Toast.LENGTH_SHORT).show();
             }
 
@@ -84,6 +105,9 @@ public class TestActivity extends AppCompatActivity implements SwipeBackActivity
 
             @Override
             public void onSearch(String s) {
+                if (!searchHistoryDAO.isKeyWordExist(s)) {
+                    searchHistoryDAO.insertHistory(s);
+                }
                 Toast.makeText(getApplicationContext(), "Search:" + s, Toast.LENGTH_SHORT).show();
                 searchBox.hideCircularlyToMenuItem(R.id.action_search_reveal, TestActivity.this);
                 toolbar.setTitle(s);

@@ -91,7 +91,7 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 openSearch();
-                return false;
+                return true;
             }
         });
 
@@ -106,7 +106,7 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
         booksListView.setAdapter(animationAdapter);
         booksListView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
 
-        // TODO recyclerView 上的点击事件处理
+        // recyclerView 上的点击事件处理
         booksListView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), booksListView, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
@@ -220,6 +220,8 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
             SearchResult option = new SearchResult("TestResult " + Integer.toString(i), getResources().getDrawable(R.drawable.ic_history_grey_24dp));
             searchBox.addSearchable(option);
         }
+        searchBox.revealFromMenuItem(R.id.action_search, this);
+
         searchBox.setMenuListener(new SearchBox.MenuListener() {
             @Override
             public void onMenuClick() {
@@ -268,7 +270,6 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
             }
         });
 
-        searchBox.revealFromMenuItem(R.id.action_search, this);
     }
 
     public void shareBook(Context context, String bookCallNum, String bookName) {

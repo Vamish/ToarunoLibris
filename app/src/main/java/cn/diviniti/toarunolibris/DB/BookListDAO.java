@@ -13,9 +13,6 @@ import java.util.Map;
 
 import cn.diviniti.toarunolibris.RecyclerModel.BookSummary;
 
-/**
- * Created by Administrator on 2015-09-28.
- */
 public class BookListDAO {
     private BookListSQL sql;
 
@@ -23,7 +20,6 @@ public class BookListDAO {
         this.sql = new BookListSQL(context);
     }
 
-    // TODO 数据库 存储可借数量 有问题 记得改
     //  增
     public void insertBook(String bookId, String bookName, String bookAuthor, String bookPubliser, String bookCallNumber) {
         SQLiteDatabase db = sql.getWritableDatabase();
@@ -36,7 +32,7 @@ public class BookListDAO {
         values.put("book_available", "点击查看");
         db.insert("booksList", null, values);
         db.close();
-        Log.d("VANGO_DB_DEBUG", "存储成功");
+        Log.d("VANGO_DB_DEBUG", "书单 - 存储成功");
     }
 
     //  删
@@ -83,7 +79,7 @@ public class BookListDAO {
         }
     }
 
-    //  TODO 查 - 一本书
+    //  查 - 一本书
     public boolean findBookById(String bookId) {
         SQLiteDatabase db = sql.getReadableDatabase();
         boolean isFound;

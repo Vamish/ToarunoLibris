@@ -15,4 +15,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="22dp"
         android:visibility="gone" />
+
+    <Button
+        android:id="@+id/delete_history"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar"
+        android:text="删除历史" />
 </RelativeLayout>
