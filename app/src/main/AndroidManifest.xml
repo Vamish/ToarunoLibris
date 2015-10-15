@@ -12,14 +12,17 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".SearchResultActivity"
             android:label="@string/title_activity_book_result"
+            android:screenOrientation="portrait"
             android:theme="@style/SwipeBack" />
         <activity
             android:name=".WelcomeActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -27,27 +30,34 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PopupSearch"
-            android:theme="@style/Theme.AppCompat.Dialog" />
-        <activity
             android:name=".BookInfoActivity"
             android:label="@string/title_activity_book_info"
+            android:screenOrientation="portrait"
             android:theme="@style/SwipeBack" />
         <activity
             android:name=".BooksList.BooksListActivity"
             android:label="@string/title_activity_books_list"
+            android:screenOrientation="portrait"
             android:theme="@style/SwipeBack" />
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
+            android:screenOrientation="portrait"
             android:theme="@style/SwipeBack" />
         <activity
             android:name=".FeedBack.FeedBackActivity"
             android:label="@string/title_activity_feed_back"
+            android:screenOrientation="portrait"
+            android:theme="@style/SwipeBack" />
+        <activity
+            android:name=".Settings.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:screenOrientation="portrait"
             android:theme="@style/SwipeBack" />
         <activity
             android:name=".test.TestActivity"
             android:label="@string/title_activity_test"
+            android:screenOrientation="portrait"
             android:theme="@style/SwipeBack" />
     </application>
 

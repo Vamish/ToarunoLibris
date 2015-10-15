@@ -2,7 +2,6 @@ package cn.diviniti.toarunolibris;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,7 +20,7 @@ import android.widget.Toast;
 
 import cn.diviniti.toarunolibris.BooksList.BooksListActivity;
 import cn.diviniti.toarunolibris.FeedBack.FeedBackActivity;
-import cn.diviniti.toarunolibris.test.TestActivity;
+import cn.diviniti.toarunolibris.Settings.SettingsActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -113,9 +112,11 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(new Intent(getApplicationContext(), BooksListActivity.class));
                         break;
                     case "设置":
-                        startActivity(new Intent(getApplicationContext(), TestActivity.class));
+                        drawerLayout.closeDrawers();
+                        startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
                         break;
                     case "反馈":
+                        drawerLayout.closeDrawers();
                         startActivity(new Intent(getApplicationContext(), FeedBackActivity.class));
                         break;
                 }

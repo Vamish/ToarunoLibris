@@ -509,11 +509,6 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
             onBackPressed();
             return true;
         }
-        switch (item.getItemId()) {
-            case R.id.action_search:
-                startActivity(new Intent(this, PopupSearch.class));
-                break;
-        }
 
         return super.onOptionsItemSelected(item);
     }

@@ -16,6 +16,7 @@
     <!--<color name="mainSecondaryTextColor">#727272</color>-->
     <!--<color name="mainDividerColor">#B6B6B6</color>-->
     <!--<color name="mainHighLightColor">#EEEEEE</color>-->
+    <color name="greyBackground">#ededed</color>
 
     <color name="refreshFourColors1">#26C6DA</color>
     <color name="refreshFourColors2">#EC407A</color>
