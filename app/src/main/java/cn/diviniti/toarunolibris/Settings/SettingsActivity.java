@@ -1,18 +1,26 @@
 package cn.diviniti.toarunolibris.Settings;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cn.diviniti.toarunolibris.R;
 import me.imid.swipebacklayout.lib.SwipeBackLayout;
@@ -26,9 +34,23 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
     private Toolbar toolbar;
     private TextView currentVerTextView;
 
+    private SwitchCompat update_switch;
+
+    //  TODO 测试用，快速跳过启动应用
+    private RelativeLayout skipLayout;
+    private SwitchCompat skipSwitch;
+    private static String SKIP_WELCOME_ACTIVITY = "SKIP_WELCOME_ACTIVITY";
+
     private RelativeLayout authorLayout;
     private RelativeLayout githubLinkLayout;
     private RelativeLayout openSourceLayout;
+    private RelativeLayout aboutLibrisLayout;
+
+    private String versionName = "";
+
+    private static String USER_SETTINGS = "USER_SETTINGS";
+    private static String ALLOW_AUTO_CHECK_UPDATE = "ALLOW_AUTO_CHECK_UPDATE";
+    private SharedPreferences settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,10 +58,41 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
         setContentView(R.layout.activity_settings);
         initToolbar();
         initSwipeBack();
+        initSettings();
+        initSkip();
         initUpdate();
         initAuthor();
         initGithub();
+        initAbout();
         initOpenSource();
+    }
+
+    private void initAbout() {
+        aboutLibrisLayout = (RelativeLayout) findViewById(R.id.about_libris);
+        aboutLibrisLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), AboutLibrisActivity.class));
+            }
+        });
+    }
+
+    private void initSkip() {
+        skipLayout = (RelativeLayout) findViewById(R.id.skip_welcome);
+        skipSwitch = (SwitchCompat) findViewById(R.id.skip_switch);
+        skipSwitch.setChecked(Boolean.valueOf(settings.getString(SKIP_WELCOME_ACTIVITY, "true")));
+        skipSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putString(SKIP_WELCOME_ACTIVITY, Boolean.toString(isChecked));
+                editor.apply();
+            }
+        });
+    }
+
+    private void initSettings() {
+        settings = getSharedPreferences(USER_SETTINGS, MODE_PRIVATE);
     }
 
     private void initGithub() {
@@ -82,7 +135,9 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
 
     private void initUpdate() {
         currentVerTextView = (TextView) findViewById(R.id.current_version_value);
-        String versionName = "";
+        update_switch = (SwitchCompat) findViewById(R.id.update_switch);
+        update_switch.setChecked(Boolean.valueOf(settings.getString(ALLOW_AUTO_CHECK_UPDATE, "true")));
+
         try {
             PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
             versionName = info.versionName;
@@ -90,9 +145,28 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
         } catch (PackageManager.NameNotFoundException e) {
             versionName = "获取版本号出错( ＞﹏＜) ";
         }
-        currentVerTextView.setText("当前版本：" +
-                versionName);
 
+        update_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putString(ALLOW_AUTO_CHECK_UPDATE, Boolean.toString(isChecked));
+                editor.apply();
+
+                if (isChecked) {
+                    checkForUpdate();
+                } else {
+                    currentVerTextView.setText("当前版本：" + versionName);
+                }
+            }
+        });
+
+        if (update_switch.isChecked()) {
+            checkForUpdate();
+        } else {
+            currentVerTextView.setText("当前版本：" + versionName);
+        }
     }
 
     private void initToolbar() {
@@ -153,4 +227,29 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
         Utils.convertActivityToTranslucent(SettingsActivity.this);
         getSwipeBackLayout().scrollToFinishActivity();
     }
+
+    public void checkForUpdate() {
+        // TODO :写个Timer做测试，4s内显示“检查更新中.....”
+        // TODO :完后显示“最新版本”
+        currentVerTextView.setText("检查更新中.....");
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                handler.sendEmptyMessage(1);
+            }
+        };
+        timer.schedule(task, 4000);
+    }
+
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 1:
+                    currentVerTextView.setText("无更新 当前版本：" + versionName);
+                    break;
+            }
+        }
+    };
 }
