@@ -1,4 +1,4 @@
-package cn.diviniti.toarunolibris;
+package cn.diviniti.toarunolibris.Welcome;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +10,9 @@ import android.widget.Toast;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import cn.diviniti.toarunolibris.MainActivity;
+import cn.diviniti.toarunolibris.R;
 
 public class WelcomeActivity extends AppCompatActivity {
 
@@ -27,10 +30,8 @@ public class WelcomeActivity extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences(USER_SETTINGS, MODE_PRIVATE);
         int SKIP_DELAY_TIME;
         if (Boolean.valueOf(settings.getString("SKIP_WELCOME_ACTIVITY", "true"))) {
-            Toast.makeText(getApplicationContext(), "快速", Toast.LENGTH_SHORT).show();
             SKIP_DELAY_TIME = 500;
         } else {
-            Toast.makeText(getApplicationContext(), "非快速", Toast.LENGTH_SHORT).show();
             SKIP_DELAY_TIME = 2000;
         }
 

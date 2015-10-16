@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private NavigationView navigationView;
+
+    private LinearLayout drawerHeaderLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +56,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void initDrawerNav() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerHeaderLayout = (LinearLayout) findViewById(R.id.drawer_header_layout);
+        final ImageView drawerHeaderIcon = (ImageView) findViewById(R.id.drawer_header_icon);
+        drawerHeaderLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerHeaderIcon.setPressed(true);
+            }
+        });
+
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         drawerLayout.setDrawerListener(drawerToggle);
         drawerLayout.post(new Runnable() {

@@ -20,7 +20,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/SwipeBack" />
         <activity
-            android:name=".WelcomeActivity"
+            android:name=".Welcome.WelcomeActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
             <intent-filter>

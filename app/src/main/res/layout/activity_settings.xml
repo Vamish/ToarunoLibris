@@ -16,7 +16,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
             android:orientation="vertical">
 
             <TextView
@@ -221,7 +223,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginTop="16dp"
-                    android:text="关于 愚者の图书馆"
+                    android:text="新手引导"
                     android:textColor="@color/mainPrimaryTextColor"
                     android:textSize="18sp" />
 

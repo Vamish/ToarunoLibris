@@ -7,11 +7,11 @@
             android:checked="true"
             android:icon="@drawable/ic_account_balance_green_24dp"
             android:title="@string/menu_drawer_main" />
-        <item
-            android:id="@+id/menu_drawer_status"
-            android:checked="true"
-            android:icon="@drawable/ic_schedule_amber_24dp"
-            android:title="@string/menu_drawer_status" />
+        <!--<item-->
+        <!--android:id="@+id/menu_drawer_status"-->
+        <!--android:checked="true"-->
+        <!--android:icon="@drawable/ic_schedule_amber_24dp"-->
+        <!--android:title="@string/menu_drawer_status" />-->
         <item
             android:id="@+id/menu_drawer_bookslist"
             android:checked="true"
