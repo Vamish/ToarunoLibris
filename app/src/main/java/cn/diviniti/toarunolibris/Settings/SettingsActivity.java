@@ -11,6 +11,7 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -19,8 +20,12 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import java.io.IOException;
 
 import cn.diviniti.toarunolibris.R;
 import me.imid.swipebacklayout.lib.SwipeBackLayout;
@@ -41,6 +46,7 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
     private SwitchCompat skipSwitch;
     private static String SKIP_WELCOME_ACTIVITY = "SKIP_WELCOME_ACTIVITY";
 
+    private RelativeLayout updataLayout;
     private RelativeLayout authorLayout;
     private RelativeLayout githubLinkLayout;
     private RelativeLayout openSourceLayout;
@@ -135,6 +141,7 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
 
     private void initUpdate() {
         currentVerTextView = (TextView) findViewById(R.id.current_version_value);
+        updataLayout = (RelativeLayout) findViewById(R.id.update_layout);
         update_switch = (SwitchCompat) findViewById(R.id.update_switch);
         update_switch.setChecked(Boolean.valueOf(settings.getString(ALLOW_AUTO_CHECK_UPDATE, "true")));
 
@@ -232,22 +239,50 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
         // TODO :写个Timer做测试，4s内显示“检查更新中.....”
         // TODO :完后显示“最新版本”
         currentVerTextView.setText("检查更新中.....");
-        Timer timer = new Timer();
-        TimerTask task = new TimerTask() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                handler.sendEmptyMessage(1);
+                try {
+                    Document doc = Jsoup.connect("http://mp.diviniti.cn/version/ver.json")
+                            .userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.99 Safari/537.36")
+                            .ignoreContentType(true)
+                            .get();
+                    Log.d("Vango_debug", doc.body().text());
+                    JSONObject json = new JSONObject(doc.body().text());
+                    if (!versionName.equals(json.getString("version_name"))) {
+                        Message msg = new Message();
+                        msg.obj = json.getString("version_name");
+                        msg.what = 1;
+                        handler.sendMessage(msg);
+                    } else {
+                        handler.sendEmptyMessage(0);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
-        };
-        timer.schedule(task, 4000);
+        }).start();
     }
 
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case 1:
+                case 0:
                     currentVerTextView.setText("无更新 当前版本：" + versionName);
+                    break;
+                case 1:
+                    currentVerTextView.setText("新版本：" + msg.obj + " 点击更新");
+                    updataLayout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Uri uri = Uri.parse("https://github.com/Vamish/HeyYo/blob/master/app/heyyo!.apk?raw=true");
+                            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                            startActivity(intent);
+                        }
+                    });
                     break;
             }
         }

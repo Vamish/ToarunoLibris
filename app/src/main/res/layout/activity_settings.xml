@@ -86,6 +86,7 @@
                 android:background="@color/mainDividerColor" />
 
             <RelativeLayout
+                android:id="@+id/update_layout"
                 android:layout_width="match_parent"
                 android:layout_height="72dp"
                 android:layout_marginBottom="10dp"
