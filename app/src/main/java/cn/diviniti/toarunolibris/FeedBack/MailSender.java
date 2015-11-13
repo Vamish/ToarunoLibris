@@ -22,6 +22,8 @@ public class MailSender extends javax.mail.Authenticator {
     private String password;
 
     //TODO:重要，上传的时候别把这个传了！！！！
+
+
     private Session session;
 
     static {
