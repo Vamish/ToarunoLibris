@@ -46,7 +46,7 @@ import me.imid.swipebacklayout.lib.Utils;
 import me.imid.swipebacklayout.lib.app.SwipeBackActivityBase;
 import me.imid.swipebacklayout.lib.app.SwipeBackActivityHelper;
 
-public class SearchResultActivity extends AppCompatActivity implements SwipeBackActivityBase {
+public class SearchResultActivitywithSearch extends AppCompatActivity implements SwipeBackActivityBase {
     private final static String VANGO_DEBUG_BOOK = "VANGO_DEBUG_BOOK";
 
     private final static int SOCKET_TIME_OUT = 0x000001;
@@ -74,7 +74,7 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_book_result);
+        setContentView(R.layout.activity_book_result_with_search);
         Intent intent = getIntent();
         if (intent != null) {
             searchKeyWords = intent.getExtras().get("searchKeyWords").toString();
@@ -87,6 +87,13 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setTitle(searchKeyWords.toUpperCase());
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                openSearch();
+                return true;
+            }
+        });
 
         initSwipeBack();
 
@@ -136,7 +143,7 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
                 final String bookCallNumber = bookCallNumberView.getText().toString();
 
                 if (!bookListDAO.findBookById(bookID)) {
-                    new MaterialDialog.Builder(SearchResultActivity.this)
+                    new MaterialDialog.Builder(SearchResultActivitywithSearch.this)
                             .title("选择功能")
                             .items(R.array.search_function)
                             .itemsCallback(new MaterialDialog.ListCallback() {
@@ -144,7 +151,7 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
                                 public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
                                     switch (which) {
                                         case 0:
-                                            shareBook(SearchResultActivity.this, bookCallNumber, bookName);
+                                            shareBook(SearchResultActivitywithSearch.this, bookCallNumber, bookName);
                                             break;
                                         case 1:
                                             bookListDAO.insertBook(bookID, bookName, bookAuthor, bookPublisher, bookCallNumber);
@@ -155,7 +162,7 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
                             })
                             .show();
                 } else {
-                    new MaterialDialog.Builder(SearchResultActivity.this)
+                    new MaterialDialog.Builder(SearchResultActivitywithSearch.this)
                             .title("选择功能")
                             .items(R.array.search_function_done)
                             .itemsCallback(new MaterialDialog.ListCallback() {
@@ -163,7 +170,7 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
                                 public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
                                     switch (which) {
                                         case 0:
-                                            shareBook(SearchResultActivity.this, bookCallNumber, bookName);
+                                            shareBook(SearchResultActivitywithSearch.this, bookCallNumber, bookName);
                                             break;
                                     }
                                 }
@@ -204,6 +211,65 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
             }
         });
         imageHolderForException = (ImageView) findViewById(R.id.img_book_not_found);
+    }
+
+    private void openSearch() {
+        searchBox = (SearchBox) findViewById(R.id.searchbox);
+        // TODO 这里要用sqlite数据代替
+        for (int i = 0; i < 5; i++) {
+            SearchResult option = new SearchResult("TestResult " + Integer.toString(i), getResources().getDrawable(R.drawable.ic_history_grey_24dp));
+            searchBox.addSearchable(option);
+        }
+        searchBox.revealFromMenuItem(R.id.action_search, this);
+
+        searchBox.setMenuListener(new SearchBox.MenuListener() {
+            @Override
+            public void onMenuClick() {
+                searchBox.hideCircularlyToMenuItem(R.id.action_search, SearchResultActivitywithSearch.this);
+            }
+        });
+        searchBox.setSearchListener(new SearchBox.SearchListener() {
+            @Override
+            public void onSearchOpened() {
+
+            }
+
+            @Override
+            public void onSearchCleared() {
+
+            }
+
+            @Override
+            public void onSearchClosed() {
+                searchBox.hideCircularlyToMenuItem(R.id.action_search_reveal, SearchResultActivitywithSearch.this);
+            }
+
+            @Override
+            public void onSearchTermChanged(String s) {
+
+            }
+
+            @Override
+            public void onSearch(String searchKeyWord) {
+                toolbar.setTitle(searchKeyWord.toUpperCase());
+                searchBox.hideCircularlyToMenuItem(R.id.action_search, SearchResultActivitywithSearch.this);
+                swipeRefreshLayout.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeRefreshLayout.setRefreshing(true);
+                    }
+                });
+                adapter = new BookSummaryAdapter(getApplicationContext(), getPageBooksListData(searchKeyWord, currentPage));
+                booksListView.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onResultClick(SearchResult searchResult) {
+                onSearch(searchResult.title);
+            }
+        });
+
     }
 
     public void shareBook(Context context, String bookCallNum, String bookName) {
@@ -341,7 +407,7 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
                             swipeRefreshLayout.setRefreshing(false);
                         }
                     });
-                    Toast.makeText(SearchResultActivity.this, "请求超时，请检查网络", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SearchResultActivitywithSearch.this, "请求超时，请检查网络", Toast.LENGTH_SHORT).show();
                     imageHolderForException.setImageResource(R.drawable.socket_time_out);
                     imageHolderForException.setVisibility(View.VISIBLE);
                     break;
@@ -352,7 +418,7 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
                             swipeRefreshLayout.setRefreshing(false);
                         }
                     });
-                    Toast.makeText(SearchResultActivity.this, "没找到 :P", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SearchResultActivitywithSearch.this, "没找到 :P", Toast.LENGTH_SHORT).show();
                     imageHolderForException.setImageResource(R.drawable.book_not_found);
                     imageHolderForException.setVisibility(View.VISIBLE);
                     break;
@@ -486,7 +552,7 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
 
     @Override
     public void scrollToFinishActivity() {
-        Utils.convertActivityToTranslucent(SearchResultActivity.this);
+        Utils.convertActivityToTranslucent(SearchResultActivitywithSearch.this);
         getSwipeBackLayout().scrollToFinishActivity();
     }
 }

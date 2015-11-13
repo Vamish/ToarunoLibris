@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case "我的书单":
                         navigationView.setItemTextColor(bookslistColorList);
+                        drawerLayout.closeDrawers();
                         startActivity(new Intent(getApplicationContext(), BooksListActivity.class));
                         break;
                     case "设置":

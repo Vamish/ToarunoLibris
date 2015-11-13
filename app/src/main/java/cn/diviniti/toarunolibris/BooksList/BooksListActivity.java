@@ -355,6 +355,7 @@ public class BooksListActivity extends AppCompatActivity implements SwipeBackAct
         mHelper = new SwipeBackActivityHelper(this);
         mHelper.onActivityCreate();
         getSwipeBackLayout().setEdgeTrackingEnabled(SwipeBackLayout.EDGE_LEFT);
+        getSwipeBackLayout().setEdgeSize(10);
     }
 
     @Override
