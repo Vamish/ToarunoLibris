@@ -28,6 +28,7 @@
         android:textSize="18sp" />
 
     <LinearLayout
+        android:id="@+id/eggs_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/logo"
@@ -42,6 +43,6 @@
             android:layout_width="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_height="wrap_content"
-            android:text="新手引导" />
+            android:text="这是一个明显的彩蛋" />
     </LinearLayout>
 </RelativeLayout>

@@ -224,7 +224,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginTop="16dp"
-                    android:text="新手引导"
+                    android:text="关于这个图书馆"
                     android:textColor="@color/mainPrimaryTextColor"
                     android:textSize="18sp" />
 

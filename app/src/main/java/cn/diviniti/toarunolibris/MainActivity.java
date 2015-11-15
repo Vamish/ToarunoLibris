@@ -1,16 +1,23 @@
 package cn.diviniti.toarunolibris;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -19,8 +26,21 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.HttpHeaders;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.util.ArrayList;
+import java.util.List;
+
 import cn.diviniti.toarunolibris.BooksList.BooksListActivity;
 import cn.diviniti.toarunolibris.FeedBack.FeedBackActivity;
+import cn.diviniti.toarunolibris.RecyclerModel.HotTag;
+import cn.diviniti.toarunolibris.RecyclerModel.HotTagAdapter;
 import cn.diviniti.toarunolibris.Settings.SettingsActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,6 +54,11 @@ public class MainActivity extends AppCompatActivity {
 
     private LinearLayout drawerHeaderLayout;
 
+    private RecyclerView hotTagView;
+    private HotTagAdapter hotTagAdapter;
+
+    private final static int HOT_TAG_LOADED = 0x01;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +67,80 @@ public class MainActivity extends AppCompatActivity {
         initToolbar();
         initDrawerNav();
         initLoginArea();
+        initHotTags();
+    }
+
+    private void initHotTags() {
+        hotTagView = (RecyclerView) findViewById(R.id.hot_tag_view);
+        hotTagAdapter = new HotTagAdapter(getApplicationContext(), getHotTags());
+        hotTagView.setAdapter(hotTagAdapter);
+        hotTagView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 2));
+        hotTagView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), hotTagView, new ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                TextView hot = (TextView) view.findViewById(R.id.hot_tag);
+                String hotName = hot.getText().toString();
+                startActivity(new Intent(getApplicationContext(), SearchResultActivity.class)
+                        .putExtra("searchKeyWords", hotName));
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
+    }
+
+    private List<HotTag> getHotTags() {
+        final List<HotTag> hotTags = new ArrayList<>();
+
+        try {
+            final String hotTagUrl = "http://smjslib.jmu.edu.cn/top100.aspx?sparaname=anywords";
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Document doc = Jsoup.connect(hotTagUrl)
+                                .userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.99 Safari/537.36")
+                                .header(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN,zh;q=0.8,en;q=0.6")
+                                .timeout(1000 * 30)
+                                .get();
+
+                        Elements tableBody = doc.select("#top100Inner tbody td");
+                        int i = 0;  //计数器
+                        for (Element td : tableBody) {
+                            final HotTag hotTag = new HotTag();
+
+                            if (i < 6) {
+                                hotTag.tagName = td.text().split("\\(")[0];
+                            } else {
+                                break;
+                            }
+                            hotTags.add(hotTag);
+                            i++;
+                        }
+
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                hotTagAdapter.notifyItemInserted(hotTags.size());
+                            }
+                        });
+                    } catch (SocketTimeoutException e) {
+                        Log.d("VANGO_DEBUG", "HOT_TAG_SOCKET_TIMEOUT:请求超时");
+                    } catch (NullPointerException e) {
+                        Log.d("VANGO_DEBUG", "HOT_TAG_NULL_POINTER:未找到");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }).start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return hotTags;
     }
 
     private void initLoginArea() {
@@ -184,10 +283,73 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void startActivity(Intent intent) {
-        Log.d("VANGO_ANIM_DEBUG", "IN IT");
         super.startActivity(intent);
         overridePendingTransition(R.anim.enter_righttoleft, R.anim.exit_righttoleft);
-
     }
+
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case HOT_TAG_LOADED:
+                    break;
+            }
+        }
+    };
+
+    class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
+        private GestureDetector gestureDetector;
+        private ClickListener clickListener;
+
+        public RecyclerTouchListener(Context context, final RecyclerView recyclerView, final ClickListener clickListener) {
+            this.clickListener = clickListener;
+            gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onSingleTapUp(MotionEvent e) {
+                    View item = recyclerView.findChildViewUnder(e.getX(), e.getY());
+                    if (item != null && clickListener != null) {
+                        clickListener.onClick(item, recyclerView.getChildPosition(item));
+                    }
+                    return super.onSingleTapUp(e);
+                }
+
+                @Override
+                public void onLongPress(MotionEvent e) {
+                    View item = recyclerView.findChildViewUnder(e.getX(), e.getY());
+                    if (item != null && clickListener != null) {
+                        clickListener.onLongClick(item, recyclerView.getChildPosition(item));
+                    }
+                    super.onLongPress(e);
+                }
+            });
+        }
+
+        @Override
+
+        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+            View item = rv.findChildViewUnder(e.getX(), e.getY());
+            if (item != null && clickListener != null & gestureDetector.onTouchEvent(e)) {
+                clickListener.onClick(item, rv.getChildPosition(item));
+            }
+            return false;
+        }
+
+        @Override
+        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+        }
+
+        @Override
+        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+        }
+    }
+
+    interface ClickListener {
+        void onClick(View view, int position);
+
+        void onLongClick(View view, int position);
+    }
+
 
 }

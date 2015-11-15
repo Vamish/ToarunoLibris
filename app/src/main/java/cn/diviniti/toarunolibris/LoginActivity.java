@@ -51,8 +51,7 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
                 String userName = userNameInput.getText().toString().trim();
                 String userPassword = userPasswordInput.getText().toString().trim();
 
-                Toast.makeText(getApplicationContext(), "name:" + userName + " userpsw:" +
-                        userPassword, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "抱歉，该功能暂时不能使用。", Toast.LENGTH_SHORT).show();
             }
         });
     }
