@@ -28,7 +28,7 @@ public class WelcomeActivity extends AppCompatActivity {
         String USER_SETTINGS = "USER_SETTINGS";
         SharedPreferences settings = getSharedPreferences(USER_SETTINGS, MODE_PRIVATE);
         int SKIP_DELAY_TIME;
-        if (Boolean.valueOf(settings.getString("SKIP_WELCOME_ACTIVITY", "true"))) {
+        if (settings.getBoolean("SKIP_WELCOME_ACTIVITY", false)) {
             SKIP_DELAY_TIME = 500;
         } else {
             SKIP_DELAY_TIME = 2000;

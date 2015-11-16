@@ -85,12 +85,12 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
     private void initSkip() {
         skipLayout = (RelativeLayout) findViewById(R.id.skip_welcome);
         skipSwitch = (SwitchCompat) findViewById(R.id.skip_switch);
-        skipSwitch.setChecked(Boolean.valueOf(settings.getString(SKIP_WELCOME_ACTIVITY, "true")));
+        skipSwitch.setChecked(settings.getBoolean(SKIP_WELCOME_ACTIVITY, false));
         skipSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 SharedPreferences.Editor editor = settings.edit();
-                editor.putString(SKIP_WELCOME_ACTIVITY, Boolean.toString(isChecked));
+                editor.putBoolean(SKIP_WELCOME_ACTIVITY, isChecked);
                 editor.apply();
             }
         });
