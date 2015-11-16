@@ -11,7 +11,6 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -236,18 +235,15 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
     }
 
     public void checkForUpdate() {
-        // TODO :写个Timer做测试，4s内显示“检查更新中.....”
-        // TODO :完后显示“最新版本”
         currentVerTextView.setText("检查更新中.....");
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Document doc = Jsoup.connect("http://mp.diviniti.cn/version/ver.json")
+                    Document doc = Jsoup.connect("http://toaru.diviniti.cn/Libris/ver/ver.json")
                             .userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.99 Safari/537.36")
                             .ignoreContentType(true)
                             .get();
-                    Log.d("Vango_debug", doc.body().text());
                     JSONObject json = new JSONObject(doc.body().text());
                     if (!versionName.equals(json.getString("version_name"))) {
                         Message msg = new Message();
@@ -278,7 +274,7 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
                     updataLayout.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Uri uri = Uri.parse("https://github.com/Vamish/HeyYo/blob/master/app/heyyo!.apk?raw=true");
+                            Uri uri = Uri.parse("http://toaru.diviniti.cn/Libris/apk/toarunolibris.apk");
                             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                             startActivity(intent);
                         }
