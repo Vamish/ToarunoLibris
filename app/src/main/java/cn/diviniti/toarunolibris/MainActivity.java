@@ -39,6 +39,7 @@ import java.util.List;
 
 import cn.diviniti.toarunolibris.BooksList.BooksListActivity;
 import cn.diviniti.toarunolibris.FeedBack.FeedBackActivity;
+import cn.diviniti.toarunolibris.HotSearch.HotSearchActivity;
 import cn.diviniti.toarunolibris.RecyclerModel.HotTag;
 import cn.diviniti.toarunolibris.RecyclerModel.HotTagAdapter;
 import cn.diviniti.toarunolibris.Settings.SettingsActivity;
@@ -71,6 +72,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initHotTags() {
+        TextView hotTagTv = (TextView) findViewById(R.id.hot_tag_tv);
+        hotTagTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), HotSearchActivity.class));
+            }
+        });
+
         hotTagView = (RecyclerView) findViewById(R.id.hot_tag_view);
         hotTagAdapter = new HotTagAdapter(getApplicationContext(), getHotTags());
         hotTagView.setAdapter(hotTagAdapter);
