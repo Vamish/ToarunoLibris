@@ -32,12 +32,12 @@
                 android:layout_gravity="start"
                 android:background="@null"
                 android:gravity="top"
-                android:hint="发现Bug了 还是 有什么建议？"
+                android:hint="发现Bug了 还是 有什么建议？\n--------\n留下你的联系方式以便我们取得联系"
                 android:maxHeight="400dp"
                 android:minHeight="200dp"
                 android:padding="@dimen/layout_padding"
                 android:textColor="@color/mainPrimaryTextColor"
-                android:textColorHint="@color/mainSecondaryTextColor" />
+                android:textColorHint="@color/mainHighLightColor" />
 
         </android.support.v7.widget.CardView>
 

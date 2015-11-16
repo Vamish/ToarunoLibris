@@ -41,7 +41,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/SwipeBack" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".Login.LoginActivity"
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait"
             android:theme="@style/SwipeBack" />

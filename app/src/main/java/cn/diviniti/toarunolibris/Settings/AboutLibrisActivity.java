@@ -51,7 +51,7 @@ public class AboutLibrisActivity extends AppCompatActivity implements SwipeBackA
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_about_libris, menu);
-        return false;
+        return true;
     }
 
     @Override
@@ -68,6 +68,12 @@ public class AboutLibrisActivity extends AppCompatActivity implements SwipeBackA
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        overridePendingTransition(R.anim.enter_lefttoright, R.anim.exit_lefttoright);
     }
 
     private void initSwipeBack() {

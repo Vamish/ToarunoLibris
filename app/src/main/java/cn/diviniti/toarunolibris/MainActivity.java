@@ -40,6 +40,7 @@ import java.util.List;
 import cn.diviniti.toarunolibris.BooksList.BooksListActivity;
 import cn.diviniti.toarunolibris.FeedBack.FeedBackActivity;
 import cn.diviniti.toarunolibris.HotSearch.HotSearchActivity;
+import cn.diviniti.toarunolibris.Login.LoginActivity;
 import cn.diviniti.toarunolibris.RecyclerModel.HotTag;
 import cn.diviniti.toarunolibris.RecyclerModel.HotTagAdapter;
 import cn.diviniti.toarunolibris.Settings.SettingsActivity;

@@ -4,7 +4,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    tools:context="cn.diviniti.toarunolibris.LoginActivity">
+    tools:context="cn.diviniti.toarunolibris.Login.LoginActivity">
 
     <include
         android:id="@id/toolbar"
