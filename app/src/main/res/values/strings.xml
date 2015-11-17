@@ -7,6 +7,7 @@
     <string name="title_activity_settings">设置</string>
     <string name="title_activity_about_libris">关于 愚者の图书馆</string>
     <string name="title_activity_hot_search">热门搜索Top100</string>
+    <string name="title_activity_borrwing_status">借阅情况</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
