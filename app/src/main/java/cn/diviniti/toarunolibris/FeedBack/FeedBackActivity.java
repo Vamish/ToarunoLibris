@@ -14,6 +14,9 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import cn.diviniti.toarunolibris.R;
 import me.imid.swipebacklayout.lib.SwipeBackLayout;
 import me.imid.swipebacklayout.lib.Utils;
@@ -69,7 +72,11 @@ public class FeedBackActivity extends AppCompatActivity implements SwipeBackActi
                         public void run() {
                             try {
                                 MailSender sender = new MailSender();
-                                sender.sendMail(content);
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                                String sendContent = content + "\n\n\n" +
+                                        "发送时间：" +
+                                        sdf.format(new Date());
+                                sender.sendMail(sendContent);
                                 handler.sendEmptyMessage(MAIL_SENT);
                             } catch (Exception e) {
                                 handler.sendEmptyMessage(MAIL_ERROR);

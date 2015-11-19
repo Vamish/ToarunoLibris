@@ -1,5 +1,7 @@
 package cn.diviniti.toarunolibris.MyStatus;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -8,10 +10,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.apache.http.HttpHeaders;
 import org.jsoup.Jsoup;
@@ -23,6 +30,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.diviniti.toarunolibris.BookInfoActivity;
+import cn.diviniti.toarunolibris.DB.BookListDAO;
+import cn.diviniti.toarunolibris.DB.UserInfoDAO;
+import cn.diviniti.toarunolibris.Login.LoginActivity;
+import cn.diviniti.toarunolibris.Login.LoginUtil;
 import cn.diviniti.toarunolibris.R;
 import cn.diviniti.toarunolibris.RecyclerModel.BorrowedBook;
 import cn.diviniti.toarunolibris.RecyclerModel.BorrowedBookAdapter;
@@ -34,6 +46,8 @@ import me.imid.swipebacklayout.lib.app.SwipeBackActivityHelper;
 public class BorrowingStatusActivity extends AppCompatActivity implements SwipeBackActivityBase {
     private SwipeBackActivityHelper mHelper;
     private String cookie;
+    private String userName;
+    private String userPwd;
 
     private RecyclerView expiredRecyclerView;
     private BorrowedBookAdapter expiredBooksAdapter;
@@ -42,8 +56,11 @@ public class BorrowingStatusActivity extends AppCompatActivity implements SwipeB
     private BorrowedBook allBorrowedBooks;
     private BorrowedBookAdapter allBorrowedBooksAdapter;
 
+    private BookListDAO bookListDAO;
+
     private final static int EXPIRED_BOOKS_NUMBER = 0x01;
     private final static int ALL_BOOKS_NUMBER = 0x02;
+    private final static int USER_INFO_LOADED = 0x03;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,27 +68,129 @@ public class BorrowingStatusActivity extends AppCompatActivity implements SwipeB
         setContentView(R.layout.activity_borrowing_status);
         initToolbar();
         initSwipeBack();
-        if (getIntent() != null) {
+        if (getIntent().getStringExtra("cookie") != null) {
             cookie = getIntent().getStringExtra("cookie");
+            initExpiredMsg();
+            initAllBorrowedMsg();
+        } else if (getIntent().getStringExtra("userInfo") != null) {
+            String userInfo = getIntent().getStringExtra("userInfo");
+            if (userInfo.equals("")) {
+                Toast.makeText(getApplicationContext(), "请先登录", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                finish();
+            } else {
+                userName = userInfo.split("&&")[0];
+                userPwd = userInfo.split("&&")[1];
+                Log.d("VNA", userName);
+                Log.d("VNA", userPwd);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        LoginUtil loginUtil = new LoginUtil(userName, userPwd);
+                        try {
+                            cookie = loginUtil.getSession();
+                            handler.sendEmptyMessage(USER_INFO_LOADED);
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
         }
-        initExpiredMsg();
-//        initAllBorrowedMsg();
     }
-//
-//    private void initAllBorrowedMsg() {
+
+    //
+    private void initAllBorrowedMsg() {
 //        allBorrowedRecyclerView = (RecyclerView) findViewById(R.id.current_borrowed_list);
 //        allBorrowedBooksAdapter = new BorrowedBookAdapter(getApplicationContext(), getAllBorrowed());
 //        allBorrowedRecyclerView.setAdapter(allBorrowedBooksAdapter);
-//        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, android.support.v7.widget.LinearLayoutManager.VERTICAL, false);
-//        linearLayoutManager.setChildSize(104);
-//        allBorrowedRecyclerView.setLayoutManager(linearLayoutManager);
-//    }
+//        allBorrowedRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<BorrowedBook> list = getAllBorrowed();
+            }
+        }).start();
+    }
 
     private void initExpiredMsg() {
         expiredRecyclerView = (RecyclerView) findViewById(R.id.expired_book_list);
         expiredBooksAdapter = new BorrowedBookAdapter(getApplicationContext(), getExpiredInfo());
         expiredRecyclerView.setAdapter(expiredBooksAdapter);
         expiredRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        expiredRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), expiredRecyclerView, new ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                TextView bookIDView = (TextView) view.findViewById(R.id.book_id);
+                TextView bookNameView = (TextView) view.findViewById(R.id.book_name);
+                TextView bookAuthorView = (TextView) view.findViewById(R.id.book_author);
+                TextView bookPublisherView = (TextView) view.findViewById(R.id.book_publisher);
+                TextView bookCallNumberView = (TextView) view.findViewById(R.id.book_call_number);
+                String bookID = bookIDView.getText().toString();
+                String bookName = bookNameView.getText().toString();
+                String bookAuthor = bookAuthorView.getText().toString();
+                String bookPublisher = bookPublisherView.getText().toString();
+                String bookCallNumber = bookCallNumberView.getText().toString();
+                startActivity(new Intent(getApplicationContext(), BookInfoActivity.class)
+                        .putExtra("bookID", bookID)
+                        .putExtra("bookName", bookName)
+                        .putExtra("bookPublisher", bookPublisher)
+                        .putExtra("bookAuthor", bookAuthor)
+                        .putExtra("bookCallNumber", bookCallNumber));
+            }
+
+            public void onLongClick(View view, int position) {
+                bookListDAO = new BookListDAO(getApplicationContext());
+                TextView bookIDView = (TextView) view.findViewById(R.id.book_id);
+                TextView bookNameView = (TextView) view.findViewById(R.id.book_name);
+                TextView bookAuthorView = (TextView) view.findViewById(R.id.book_author);
+                TextView bookPublisherView = (TextView) view.findViewById(R.id.book_publisher);
+                TextView bookCallNumberView = (TextView) view.findViewById(R.id.book_call_number);
+                final String bookID = bookIDView.getText().toString();
+                final String bookName = bookNameView.getText().toString();
+                final String bookAuthor = bookAuthorView.getText().toString();
+                final String bookPublisher = bookPublisherView.getText().toString();
+                final String bookCallNumber = bookCallNumberView.getText().toString();
+
+                if (!bookListDAO.findBookById(bookID)) {
+                    new MaterialDialog.Builder(BorrowingStatusActivity.this)
+                            .title("选择功能")
+                            .items(R.array.search_function)
+                            .itemsCallback(new MaterialDialog.ListCallback() {
+                                @Override
+                                public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                    switch (which) {
+                                        case 0:
+                                            shareBook(BorrowingStatusActivity.this, bookCallNumber, bookName);
+                                            break;
+                                        case 1:
+                                            bookListDAO.insertBook(bookID, bookName, bookAuthor, bookPublisher, bookCallNumber);
+                                            Toast.makeText(getApplicationContext(), "已保存", Toast.LENGTH_SHORT).show();
+                                            break;
+                                    }
+                                }
+                            })
+                            .show();
+                } else {
+                    new MaterialDialog.Builder(BorrowingStatusActivity.this)
+                            .title("选择功能")
+                            .items(R.array.search_function_done)
+                            .itemsCallback(new MaterialDialog.ListCallback() {
+                                @Override
+                                public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                    switch (which) {
+                                        case 0:
+                                            shareBook(BorrowingStatusActivity.this, bookCallNumber, bookName);
+                                            break;
+                                    }
+                                }
+                            })
+                            .show();
+                }
+            }
+        }));
     }
 
     private List<BorrowedBook> getExpiredInfo() {
@@ -143,6 +262,8 @@ public class BorrowingStatusActivity extends AppCompatActivity implements SwipeB
                         }
                     });
 
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -211,7 +332,7 @@ public class BorrowingStatusActivity extends AppCompatActivity implements SwipeB
                             msg.what = ALL_BOOKS_NUMBER;
                             msg.obj = allBorrowedTable.size();
                             handler.sendMessage(msg);
-                            allBorrowedBooksAdapter.notifyItemInserted(allBorrowedBooks.size());
+//                            allBorrowedBooksAdapter.notifyItemInserted(allBorrowedBooks.size());
                         }
                     });
                 } catch (IOException e) {
@@ -292,10 +413,79 @@ public class BorrowingStatusActivity extends AppCompatActivity implements SwipeB
 
         if (id == R.id.action_exit) {
             //TODO 退出
+            UserInfoDAO userInfoDAO = new UserInfoDAO(BorrowingStatusActivity.this);
+            userInfoDAO.deleteUser(userName);
+            finish();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void shareBook(Context context, String bookCallNum, String bookName) {
+        String shareString = "索书号：" + bookCallNum + "\n" +
+                "书名：" + bookName;
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "分享图书信息");
+        intent.putExtra(Intent.EXTRA_TEXT, shareString);
+        intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        context.startActivity(Intent.createChooser(intent, "分享"));
+    }
+
+
+    class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
+        private GestureDetector gestureDetector;
+        private ClickListener clickListener;
+
+        public RecyclerTouchListener(Context context, final RecyclerView recyclerView, final ClickListener clickListener) {
+            this.clickListener = clickListener;
+            gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onSingleTapUp(MotionEvent e) {
+                    View item = recyclerView.findChildViewUnder(e.getX(), e.getY());
+                    if (item != null && clickListener != null) {
+                        clickListener.onClick(item, recyclerView.getChildPosition(item));
+                    }
+                    return super.onSingleTapUp(e);
+                }
+
+                @Override
+                public void onLongPress(MotionEvent e) {
+                    View item = recyclerView.findChildViewUnder(e.getX(), e.getY());
+                    if (item != null && clickListener != null) {
+                        clickListener.onLongClick(item, recyclerView.getChildPosition(item));
+                    }
+                    super.onLongPress(e);
+                }
+            });
+        }
+
+        @Override
+
+        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+            View item = rv.findChildViewUnder(e.getX(), e.getY());
+            if (item != null && clickListener != null & gestureDetector.onTouchEvent(e)) {
+                clickListener.onClick(item, rv.getChildPosition(item));
+            }
+            return false;
+        }
+
+        @Override
+        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+        }
+
+        @Override
+        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+        }
+    }
+
+    interface ClickListener {
+        void onClick(View view, int position);
+
+        void onLongClick(View view, int position);
     }
 
     Handler handler = new Handler() {
@@ -309,6 +499,10 @@ public class BorrowingStatusActivity extends AppCompatActivity implements SwipeB
                 case ALL_BOOKS_NUMBER:
                     TextView allBorrowedBook = (TextView) findViewById(R.id.current_borrowed);
                     allBorrowedBook.setText(msg.obj.toString());
+                    break;
+                case USER_INFO_LOADED:
+                    initExpiredMsg();
+                    initAllBorrowedMsg();
                     break;
             }
         }

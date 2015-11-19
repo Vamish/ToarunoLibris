@@ -43,7 +43,6 @@ dependencies {
         transitive = true
     }
     compile 'com.quinny898.library.persistentsearch:library:1.1.0-SNAPSHOT'
-    compile 'org.solovyev.android.views:linear-layout-manager:0.5@aar'
     compile project(':activation-1.1')
     compile project(':additionnal-1.1')
     compile project(':mail-1.0')

@@ -18,10 +18,9 @@ import javax.mail.internet.MimeMessage;
 
 public class MailSender extends javax.mail.Authenticator {
     private String mailHost = "smtp.qq.com";
-    private String user;
-    private String password;
+    private String user = "859152811@qq.com";
+    private String password = "diviniti123.";
 
-    //TODO:重要，上传的时候别把这个传了！！！！
     private Session session;
 
     static {

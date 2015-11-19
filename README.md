@@ -6,11 +6,9 @@
 Android App
 
 ## 目前功能
+* 查询借书状态 
 * 查询图书，数据来源:http://smjslib.jmu.cn
 * 收藏图书
-
-## 待增功能
-* 查询借书状态 ( 我也期待下一个版本会有吧 )
 
 ## 目前问题
 * SearchResultActivity内再搜索时搜索框出现问题

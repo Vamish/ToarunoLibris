@@ -38,9 +38,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.diviniti.toarunolibris.BooksList.BooksListActivity;
+import cn.diviniti.toarunolibris.DB.UserInfoDAO;
 import cn.diviniti.toarunolibris.FeedBack.FeedBackActivity;
 import cn.diviniti.toarunolibris.HotSearch.HotSearchActivity;
 import cn.diviniti.toarunolibris.Login.LoginActivity;
+import cn.diviniti.toarunolibris.MyStatus.BorrowingStatusActivity;
 import cn.diviniti.toarunolibris.RecyclerModel.HotTag;
 import cn.diviniti.toarunolibris.RecyclerModel.HotTagAdapter;
 import cn.diviniti.toarunolibris.Settings.SettingsActivity;
@@ -59,12 +61,17 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView hotTagView;
     private HotTagAdapter hotTagAdapter;
 
+    private UserInfoDAO userInfoDAO;
+
     private final static int HOT_TAG_LOADED = 0x01;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        userInfoDAO = new UserInfoDAO(getApplicationContext());
+
         initSearchInputFocusCursor();
         initToolbar();
         initDrawerNav();
@@ -155,13 +162,27 @@ public class MainActivity extends AppCompatActivity {
 
     private void initLoginArea() {
         ImageView imgUserUnlogged = (ImageView) findViewById(R.id.img_user_unlogged);
-        imgUserUnlogged.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, LoginActivity.class));
-            }
-        });
+        if (userInfoDAO.hasUserLogin()) {
+            imgUserUnlogged.setImageResource(R.drawable.no_books_here);
+            imgUserUnlogged.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(MainActivity.this, BorrowingStatusActivity.class)
+                            .putExtra("userInfo", userInfoDAO.searchUser()));
+                }
+            });
+        } else {
+            imgUserUnlogged.setImageResource(R.drawable.img_index_unlogged_hint);
+            imgUserUnlogged.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                }
+            });
+        }
+
     }
+
 
     private void initDrawerNav() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -226,6 +247,9 @@ public class MainActivity extends AppCompatActivity {
                         navigationView.setItemTextColor(mainColorStateList);
                         break;
                     case "借阅状态":
+                        drawerLayout.closeDrawers();
+                        startActivity(new Intent(getApplicationContext(), BorrowingStatusActivity.class)
+                                .putExtra("userInfo", userInfoDAO.searchUser()));
                         navigationView.setItemTextColor(statusColorList);
                         break;
                     case "我的书单":
@@ -362,4 +386,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onResume() {
+        initLoginArea();
+        super.onResume();
+    }
 }

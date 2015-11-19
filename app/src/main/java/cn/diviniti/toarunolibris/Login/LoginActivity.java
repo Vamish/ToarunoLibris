@@ -7,6 +7,7 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,15 +16,12 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import org.apache.http.HttpHeaders;
-import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
-import org.jsoup.Jsoup;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.net.SocketTimeoutException;
 
+import cn.diviniti.toarunolibris.DB.UserInfoDAO;
 import cn.diviniti.toarunolibris.MyStatus.BorrowingStatusActivity;
 import cn.diviniti.toarunolibris.R;
 import me.imid.swipebacklayout.lib.SwipeBackLayout;
@@ -38,6 +36,7 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
     private MaterialDialog logingDialog;
 
     private final static int USER_OR_PASSWORD_WRONG = 0x01;
+    private final static int SOCKET_TIME_OUT = 0x02;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,50 +77,31 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
         });
     }
 
-    private void userLogin(final String userName, final String userPassword) {
+    private void userLogin(final String userName, final String userPwd) {
         logingDialog.getBuilder()
                 .content("登录中")
                 .progress(true, 0)
                 .progressIndeterminateStyle(true)
                 .show();
-        final String url_1 = "http://libinfo.jmu.edu.cn/cuser/";
-        final String url_2 = "http://smjslib.jmu.edu.cn/user/userinfo.aspx";
-
-        final Map<String, String> params = new LinkedHashMap<>();
-        params.put("__VIEWSTATE", "/wEPDwULLTE3OTEyNjY3NjEPZBYCAgMPZBYCAgsPDxYGHgRUZXh0BRvnlKjmiLflkI3miJblr4bnoIHplJnor6/vvIEeCUZvcmVDb2xvcgqNAR4EXyFTQgIEZGRkei/L2q/Q2ShlyWBAMbzKVTaXfpgK3HpQkyBl5XSsMSc=");
-        params.put("__EVENTVALIDATION", "/wEWBAKH14rCAQLcgpeMBwLGmdGVDAKM54rGBmcmiPP8UWvSgW6e+go9TWFHdtUYfvFJZ9Z1K+fsNwrE");
-        //TODO 别傻了，这边得填他们的！
-        params.put("user", userName);
-        params.put("pwd", userPassword);
-        params.put("Button1", "登录");
-
         new Thread(new Runnable() {
             @Override
             public void run() {
                 Response response = null;
                 try {
-                    /* 页面会有两次跳转，所以
-                     * 第一次访问获取cookie
-                     * 第二次访问带着这个cookie
-                     */
-                    response = Jsoup.connect(url_1)
-                            .method(Method.POST)
-                            .header(HttpHeaders.CONTENT_TYPE, "x-www-form-urlencoded")
-                            .header(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36")
-                            .header(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN,zh;q=0.8,en;q=0.6")
-                            .data(params)
-                            .execute();
+                    LoginUtil loginUtil = new LoginUtil(userName, userPwd);
+                    String cookie = loginUtil.getSession();
 
-                    String iPlanetDirectoryPro = response.cookie("iPlanetDirectoryPro");
-
-                    saveUserInfo();
+                    saveUserInfo(userName, userPwd);
                     startActivity(new Intent(getApplicationContext(), BorrowingStatusActivity.class)
-                            .putExtra("cookie", iPlanetDirectoryPro));
+                            .putExtra("cookie", cookie));
                     finish();
-                } catch (IllegalArgumentException e) {
+                } catch (NullPointerException e) {
                     //这种情况是用户名或者密码输入错误的
                     logingDialog.dismiss();
                     handler.sendEmptyMessage(USER_OR_PASSWORD_WRONG);
+                } catch (SocketTimeoutException e) {
+                    e.printStackTrace();
+                    handler.sendEmptyMessage(SOCKET_TIME_OUT);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -130,8 +110,11 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
         }).start();
     }
 
-    private void saveUserInfo() {
+    private void saveUserInfo(String userName, String userPwd) {
         //TODO 存储用户名和密码
+        Log.i("VANGO_", userName + " " + userPwd);
+        UserInfoDAO userInfoDAO = new UserInfoDAO(getApplicationContext());
+        userInfoDAO.insertUser(userName, userPwd);
     }
 
     private void initToolbar() {
@@ -216,6 +199,13 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
                             .title("登录失败")
                             .content("检查一下学号还是密码，登不上去")
                             .positiveText("好的")
+                            .show();
+                    break;
+                case SOCKET_TIME_OUT:
+                    new MaterialDialog.Builder(LoginActivity.this)
+                            .title("登录失败")
+                            .content("检查一下网络")
+                            .positiveText("哦")
                             .show();
                     break;
             }
