@@ -16,7 +16,12 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import org.apache.http.HttpHeaders;
 import org.jsoup.Connection.Response;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -35,8 +40,11 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
 
     private MaterialDialog logingDialog;
 
+    private UserInfoDAO userInfoDAO;
+
     private final static int USER_OR_PASSWORD_WRONG = 0x01;
     private final static int SOCKET_TIME_OUT = 0x02;
+    private final static int GET_USER_INFO_DONE = 0x03;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +52,7 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
         setContentView(R.layout.activity_login);
         initToolbar();
         initSwipeBack();
+        userInfoDAO = new UserInfoDAO(getApplicationContext());
         logingDialog = new MaterialDialog.Builder(LoginActivity.this).build();
         initLogin();
     }
@@ -57,7 +66,7 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
     private void initLogin() {
         final CardView btnArea = (CardView) findViewById(R.id.login_btn);
 
-        final EditText userNameInput = (EditText) findViewById(R.id.login_username);
+        final EditText userNumInput = (EditText) findViewById(R.id.login_usernumber);
         final EditText userPasswordInput = (EditText) findViewById(R.id.login_password);
 
 
@@ -65,11 +74,11 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
             @Override
             public void onClick(View v) {
                 btnArea.setCardElevation(12);
-                String userName = userNameInput.getText().toString().trim();
+                String userNum = userNumInput.getText().toString().trim();
                 String userPassword = userPasswordInput.getText().toString().trim();
                 //TODO 记得把这个加上
-                if (!userName.equals("") && !userPassword.equals("")) {
-                    userLogin(userName, userPassword);
+                if (!userNum.equals("") && !userPassword.equals("")) {
+                    userLogin(userNum, userPassword);
                 } else {
                     Toast.makeText(getApplicationContext(), "别急，输完再登", Toast.LENGTH_SHORT).show();
                 }
@@ -77,7 +86,7 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
         });
     }
 
-    private void userLogin(final String userName, final String userPwd) {
+    private void userLogin(final String userNum, final String userPwd) {
         logingDialog.getBuilder()
                 .content("登录中")
                 .progress(true, 0)
@@ -88,10 +97,10 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
             public void run() {
                 Response response = null;
                 try {
-                    LoginUtil loginUtil = new LoginUtil(userName, userPwd);
+                    LoginUtil loginUtil = new LoginUtil(userNum, userPwd);
                     String cookie = loginUtil.getSession();
 
-                    saveUserInfo(userName, userPwd);
+                    saveUserInfo(cookie, userNum, userPwd);
                     startActivity(new Intent(getApplicationContext(), BorrowingStatusActivity.class)
                             .putExtra("cookie", cookie));
                     finish();
@@ -110,11 +119,34 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
         }).start();
     }
 
-    private void saveUserInfo(String userName, String userPwd) {
+    private void saveUserInfo(final String cookie, final String userNum, final String userPwd) {
         //TODO 存储用户名和密码
-        Log.i("VANGO_", userName + " " + userPwd);
-        UserInfoDAO userInfoDAO = new UserInfoDAO(getApplicationContext());
-        userInfoDAO.insertUser(userName, userPwd);
+        Log.i("VANGO_", userNum + " " + userPwd);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Document document = Jsoup.connect("http://smjslib.jmu.edu.cn/user/userinfo.aspx")
+                            .header(HttpHeaders.CONTENT_TYPE, "x-www-form-urlencoded")
+                            .header(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36")
+                            .header(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN,zh;q=0.8,en;q=0.6")
+                            .cookie("iPlanetDirectoryPro", cookie)
+                            .post();
+
+                    Elements elements = document.select(".inforight");
+                    Element userName = elements.get(1);
+                    Log.d("VNA", userName.text());
+                    Element userCol = elements.get(3);
+                    Log.d("VNA", userCol.text());
+                    Message msg = new Message();
+                    msg.what = GET_USER_INFO_DONE;
+                    msg.obj = new String[]{userNum, userPwd, userName.text(), userCol.text()};
+                    handler.sendMessage(msg);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     private void initToolbar() {
@@ -207,6 +239,10 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
                             .content("检查一下网络")
                             .positiveText("哦")
                             .show();
+                    break;
+                case GET_USER_INFO_DONE:
+                    String[] infos = (String[]) msg.obj;
+                    userInfoDAO.insertUser(infos[0], infos[1], infos[2], infos[3]);
                     break;
             }
         }

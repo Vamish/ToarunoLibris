@@ -174,43 +174,7 @@
                 android:layout_height="1dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginStart="10dp"
-                android:background="@color/mainDividerColor" />
-
-            <RelativeLayout
-                android:id="@+id/github_link"
-                android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Github"
-                        android:textColor="@color/mainPrimaryTextColor"
-                        android:textSize="18sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="ToarunoLibris"
-                        android:textColor="@color/mainSecondaryTextColor"
-                        android:textSize="18sp" />
-                </LinearLayout>
-            </RelativeLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginStart="10dp"
-                android:background="@color/mainDividerColor" />
+                android:background="@color/mainHighLightColor" />
 
             <RelativeLayout
                 android:id="@+id/about_libris"
@@ -235,7 +199,7 @@
                 android:layout_height="1dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginStart="10dp"
-                android:background="@color/mainDividerColor" />
+                android:background="@color/mainHighLightColor" />
 
             <RelativeLayout
                 android:id="@+id/open_source_layout"

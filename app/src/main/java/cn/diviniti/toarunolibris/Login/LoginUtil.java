@@ -9,11 +9,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class LoginUtil {
-    private String userName;
+    private String userNum;
     private String userPwd;
 
-    public LoginUtil(String userName, String userPwd) {
-        this.userName = userName;
+    public LoginUtil(String userNum, String userPwd) {
+        this.userNum = userNum;
         this.userPwd = userPwd;
     }
 
@@ -24,7 +24,7 @@ public class LoginUtil {
         params.put("__VIEWSTATE", "/wEPDwULLTE3OTEyNjY3NjEPZBYCAgMPZBYCAgsPDxYGHgRUZXh0BRvnlKjmiLflkI3miJblr4bnoIHplJnor6/vvIEeCUZvcmVDb2xvcgqNAR4EXyFTQgIEZGRkei/L2q/Q2ShlyWBAMbzKVTaXfpgK3HpQkyBl5XSsMSc=");
         params.put("__EVENTVALIDATION", "/wEWBAKH14rCAQLcgpeMBwLGmdGVDAKM54rGBmcmiPP8UWvSgW6e+go9TWFHdtUYfvFJZ9Z1K+fsNwrE");
         //TODO 别傻了，这边得填他们的！
-        params.put("user", userName);
+        params.put("user", userNum);
         params.put("pwd", userPwd);
         params.put("Button1", "登录");
         Connection.Response response = Jsoup.connect(url)

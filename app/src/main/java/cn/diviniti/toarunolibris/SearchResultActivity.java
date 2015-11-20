@@ -22,7 +22,6 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.quinny898.library.persistentsearch.SearchBox;
-import com.quinny898.library.persistentsearch.SearchResult;
 
 import org.apache.http.HttpHeaders;
 import org.jsoup.Jsoup;
@@ -228,6 +227,7 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
         final List<BookSummary> booksList = new ArrayList<>();
 
         try {
+
             searchKeyWord = URLEncoder.encode(searchKeyWord, "UTF-8");
             final String url = "http://smjslib.jmu.edu.cn/searchresult.aspx?" +
                     "anywords=" + searchKeyWord +

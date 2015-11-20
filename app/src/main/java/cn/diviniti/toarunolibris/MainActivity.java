@@ -35,6 +35,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import cn.diviniti.toarunolibris.BooksList.BooksListActivity;
@@ -128,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                         for (Element td : tableBody) {
                             final HotTag hotTag = new HotTag();
 
-                            if (i < 6) {
+                            if (i < 8) {
                                 hotTag.tagName = td.text().split("\\(")[0];
                             } else {
                                 break;
@@ -161,9 +162,58 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initLoginArea() {
+        TextView welcomeTitle = (TextView) findViewById(R.id.welcome_title);
+        TextView welcomeContent = (TextView) findViewById(R.id.welcome_content);
+
         ImageView imgUserUnlogged = (ImageView) findViewById(R.id.img_user_unlogged);
         if (userInfoDAO.hasUserLogin()) {
-            imgUserUnlogged.setImageResource(R.drawable.no_books_here);
+            welcomeTitle.setVisibility(View.VISIBLE);
+            welcomeContent.setVisibility(View.VISIBLE);
+            Date date = new Date();
+            String welcome = "";
+            String userName = userInfoDAO.getUserName();
+            switch (date.getHours()) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                    welcome = "夜深了还不睡啊";
+                    break;
+                case 5:
+                    welcome = "一起看日出吗？";
+                    break;
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                    welcome = "早上好  " + userName;
+                    break;
+                case 12:
+                case 13:
+                    welcome = "中午好  " + userName;
+                    break;
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                    welcome = "下午好  " + userName;
+                    break;
+                case 18:
+                case 19:
+                    welcome = "傍晚好  " + userName;
+                    break;
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                    welcome = "晚上好  " + userName;
+                    break;
+            }
+            welcomeContent.setText(welcome);
+            imgUserUnlogged.setImageResource(R.drawable.img_index_loged_hint);
             imgUserUnlogged.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -172,6 +222,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         } else {
+            welcomeTitle.setVisibility(View.GONE);
+            welcomeContent.setVisibility(View.GONE);
             imgUserUnlogged.setImageResource(R.drawable.img_index_unlogged_hint);
             imgUserUnlogged.setOnClickListener(new View.OnClickListener() {
                 @Override

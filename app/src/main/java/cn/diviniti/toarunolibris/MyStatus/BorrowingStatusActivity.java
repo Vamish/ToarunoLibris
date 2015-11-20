@@ -413,9 +413,26 @@ public class BorrowingStatusActivity extends AppCompatActivity implements SwipeB
 
         if (id == R.id.action_exit) {
             //TODO 退出
-            UserInfoDAO userInfoDAO = new UserInfoDAO(BorrowingStatusActivity.this);
-            userInfoDAO.deleteUser(userName);
-            finish();
+            new MaterialDialog.Builder(BorrowingStatusActivity.this)
+                    .title("提示")
+                    .content("是否退出？")
+                    .positiveText("是的")
+                    .negativeText("手滑了")
+                    .neutralText("( ⊙ o ⊙ )")
+                    .neutralColor(getResources().getColor(android.R.color.white))
+                    .callback(new MaterialDialog.ButtonCallback() {
+                        @Override
+                        public void onPositive(MaterialDialog dialog) {
+                            UserInfoDAO userInfoDAO = new UserInfoDAO(BorrowingStatusActivity.this);
+                            userInfoDAO.deleteUser(userName);
+                            finish();
+                        }
+
+                        @Override
+                        public void onNeutral(MaterialDialog dialog) {
+                            Toast.makeText(getApplicationContext(), "(⊙o⊙)哦，被你发现了！不错哦~", Toast.LENGTH_SHORT).show();
+                        }
+                    }).show();
             return true;
         }
 

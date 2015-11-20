@@ -47,7 +47,6 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
 
     private RelativeLayout updataLayout;
     private RelativeLayout authorLayout;
-    private RelativeLayout githubLinkLayout;
     private RelativeLayout openSourceLayout;
     private RelativeLayout aboutLibrisLayout;
 
@@ -67,7 +66,7 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
         initSkip();
         initUpdate();
         initAuthor();
-        initGithub();
+//        initGithub();
         initAbout();
         initOpenSource();
     }
@@ -100,18 +99,6 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
         settings = getSharedPreferences(USER_SETTINGS, MODE_PRIVATE);
     }
 
-    private void initGithub() {
-        githubLinkLayout = (RelativeLayout) findViewById(R.id.github_link);
-        githubLinkLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Uri uri = Uri.parse("https://github.com/Vamish/ToarunoLibris");
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                startActivity(intent);
-            }
-        });
-    }
-
     private void initAuthor() {
         authorLayout = (RelativeLayout) findViewById(R.id.author_layout);
         authorLayout.setOnClickListener(new View.OnClickListener() {
@@ -133,7 +120,16 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
                         .title("Open Source Licence")
                         .customView(R.layout.layout_open_source_info, true)
                         .positiveText("确定")
-                        .show();
+                        .neutralText("Github")
+                        .neutralColor(getResources().getColor(android.R.color.white))
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onNeutral(MaterialDialog dialog) {
+                                Uri uri = Uri.parse("https://github.com/Vamish/ToarunoLibris");
+                                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                                startActivity(intent);
+                            }
+                        }).show();
             }
         });
     }
@@ -274,7 +270,7 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
                     updataLayout.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Uri uri = Uri.parse("http://toaru.diviniti.cn/Libris/apk/toarunolibris.apk");
+                            Uri uri = Uri.parse("http://toaru.diviniti.cn/Libris/");
                             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                             startActivity(intent);
                         }

@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
@@ -42,6 +43,14 @@ public class AboutLibrisActivity extends AppCompatActivity implements SwipeBackA
                         .content("送给idea 和所有爱书的人。")
                         .negativeText("知道了")
                         .positiveText("退下吧")
+                        .neutralColor(getResources().getColor(android.R.color.white))
+                        .neutralText("还有你")
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onNeutral(MaterialDialog dialog) {
+                                Toast.makeText(getApplicationContext(), "(づ￣ 3￣)づ", Toast.LENGTH_SHORT).show();
+                            }
+                        })
                         .show();
             }
         });
