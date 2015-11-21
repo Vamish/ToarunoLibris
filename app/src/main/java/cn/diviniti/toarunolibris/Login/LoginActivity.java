@@ -38,7 +38,7 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
 
     private SwipeBackActivityHelper mHelper;
 
-    private MaterialDialog logingDialog;
+    MaterialDialog logingDialog = null;
 
     private UserInfoDAO userInfoDAO;
 
@@ -53,7 +53,12 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
         initToolbar();
         initSwipeBack();
         userInfoDAO = new UserInfoDAO(getApplicationContext());
-        logingDialog = new MaterialDialog.Builder(LoginActivity.this).build();
+        logingDialog = new MaterialDialog.Builder(LoginActivity.this)
+                .content("登录中")
+                .progress(true, 0)
+                .progressIndeterminateStyle(true)
+                .autoDismiss(true)
+                .build();
         initLogin();
     }
 
@@ -87,11 +92,7 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
     }
 
     private void userLogin(final String userNum, final String userPwd) {
-        logingDialog.getBuilder()
-                .content("登录中")
-                .progress(true, 0)
-                .progressIndeterminateStyle(true)
-                .show();
+        logingDialog.show();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -100,21 +101,21 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
                     LoginUtil loginUtil = new LoginUtil(userNum, userPwd);
                     String cookie = loginUtil.getSession();
 
-                    saveUserInfo(cookie, userNum, userPwd);
-                    startActivity(new Intent(getApplicationContext(), BorrowingStatusActivity.class)
-                            .putExtra("cookie", cookie));
-                    finish();
-                } catch (NullPointerException e) {
-                    //这种情况是用户名或者密码输入错误的
-                    logingDialog.dismiss();
-                    handler.sendEmptyMessage(USER_OR_PASSWORD_WRONG);
+                    if (cookie != null) {
+                        saveUserInfo(cookie, userNum, userPwd);
+                        startActivity(new Intent(getApplicationContext(), BorrowingStatusActivity.class)
+                                .putExtra("cookie", cookie));
+                        finish();
+                    } else {
+                        Log.d("VNA", "存储用户失败");
+                        handler.sendEmptyMessage(USER_OR_PASSWORD_WRONG);
+                    }
                 } catch (SocketTimeoutException e) {
                     e.printStackTrace();
                     handler.sendEmptyMessage(SOCKET_TIME_OUT);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
             }
         }).start();
     }
@@ -227,6 +228,7 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case USER_OR_PASSWORD_WRONG:
+                    logingDialog.dismiss();
                     new MaterialDialog.Builder(LoginActivity.this)
                             .title("登录失败")
                             .content("检查一下学号还是密码，登不上去")
@@ -234,6 +236,7 @@ public class LoginActivity extends AppCompatActivity implements SwipeBackActivit
                             .show();
                     break;
                 case SOCKET_TIME_OUT:
+                    logingDialog.dismiss();
                     new MaterialDialog.Builder(LoginActivity.this)
                             .title("登录失败")
                             .content("检查一下网络")

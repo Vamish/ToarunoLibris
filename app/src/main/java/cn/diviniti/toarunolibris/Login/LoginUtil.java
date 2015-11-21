@@ -5,6 +5,7 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ public class LoginUtil {
         this.userPwd = userPwd;
     }
 
-    public String getSession() throws NullPointerException, IOException {
+    public String getSession() throws SocketTimeoutException, IOException {
         final String url = "http://libinfo.jmu.edu.cn/cuser/";
 
         final Map<String, String> params = new LinkedHashMap<>();
@@ -33,6 +34,7 @@ public class LoginUtil {
                 .header(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36")
                 .header(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN,zh;q=0.8,en;q=0.6")
                 .data(params)
+                .timeout(1000 * 30)
                 .execute();
 
         String iPlanetDirectoryPro = response.cookie("iPlanetDirectoryPro");
