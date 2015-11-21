@@ -19,12 +19,14 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 
 import cn.diviniti.toarunolibris.R;
 import me.imid.swipebacklayout.lib.SwipeBackLayout;
@@ -55,6 +57,11 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
     private static String USER_SETTINGS = "USER_SETTINGS";
     private static String ALLOW_AUTO_CHECK_UPDATE = "ALLOW_AUTO_CHECK_UPDATE";
     private SharedPreferences settings;
+
+    private final static int NO_UPGRADE = 0x00;
+    private final static int UPGRADE_AVAILABLE = 0x01;
+    private final static int TIME_OUT_EXCEPTION = 0x03;
+    private final static int UNKNOWN_EXCEPTION = 0x04;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -239,16 +246,19 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
                     Document doc = Jsoup.connect("http://toaru.diviniti.cn/Libris/ver/ver.json")
                             .userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.99 Safari/537.36")
                             .ignoreContentType(true)
+                            .timeout(1000 * 10)
                             .get();
-                    JSONObject json = new JSONObject(doc.body().text());
-                    if (!versionName.equals(json.getString("version_name"))) {
+                    JSONObject versionJson = new JSONObject(doc.body().text());
+                    if (!versionName.equals(versionJson.getString("version_name"))) {
                         Message msg = new Message();
-                        msg.obj = json.getString("version_name");
-                        msg.what = 1;
+                        msg.obj = versionJson;
+                        msg.what = UPGRADE_AVAILABLE;
                         handler.sendMessage(msg);
                     } else {
-                        handler.sendEmptyMessage(0);
+                        handler.sendEmptyMessage(NO_UPGRADE);
                     }
+                } catch (SocketTimeoutException e) {
+                    handler.sendEmptyMessage(TIME_OUT_EXCEPTION);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (JSONException e) {
@@ -262,19 +272,50 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case 0:
+                case NO_UPGRADE:
                     currentVerTextView.setText("无更新 当前版本：" + versionName);
                     break;
-                case 1:
-                    currentVerTextView.setText("新版本：" + msg.obj + " 点击更新");
-                    updataLayout.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Uri uri = Uri.parse("http://toaru.diviniti.cn/Libris/");
-                            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                            startActivity(intent);
+                case UPGRADE_AVAILABLE:
+                    JSONObject versionJson = (JSONObject) msg.obj;
+                    try {
+                        String versionName = versionJson.getString("version_name");
+                        JSONArray versionIntro = versionJson.getJSONArray("version_intro");
+                        String content = "";
+                        for (int i = 0; i < versionIntro.length(); i++) {
+                            content += versionIntro.get(i) + "\n";
                         }
-                    });
+                        currentVerTextView.setText("新版本：" + versionName + " 点击更新");
+                        final String finalContent = content;
+                        updataLayout.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                new MaterialDialog.Builder(SettingsActivity.this)
+                                        .icon(getResources().getDrawable(R.drawable.ic_launcher))
+                                        .title("新版本可更新")
+                                        .content(finalContent)
+                                        .positiveText("下载")
+                                        .negativeText("这次算了")
+                                        .callback(new MaterialDialog.ButtonCallback() {
+                                            @Override
+                                            public void onPositive(MaterialDialog dialog) {
+                                                Uri uri = Uri.parse("http://toaru.diviniti.cn/Libris/");
+                                                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                                                startActivity(intent);
+                                            }
+                                        })
+                                        .show();
+                            }
+                        });
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        handler.sendEmptyMessage(UNKNOWN_EXCEPTION);
+                    }
+                    break;
+                case TIME_OUT_EXCEPTION:
+                    currentVerTextView.setText("连接超时，稍后再试。");
+                    break;
+                case UNKNOWN_EXCEPTION:
+                    currentVerTextView.setText("获取版本异常。");
                     break;
             }
         }
