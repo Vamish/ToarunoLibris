@@ -135,24 +135,29 @@ public class SearchResultActivity extends AppCompatActivity implements SwipeBack
                 final String bookCallNumber = bookCallNumberView.getText().toString();
 
                 if (!bookListDAO.findBookById(bookID)) {
-                    new MaterialDialog.Builder(SearchResultActivity.this)
-                            .title("选择功能")
-                            .items(R.array.search_function)
-                            .itemsCallback(new MaterialDialog.ListCallback() {
-                                @Override
-                                public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                    switch (which) {
-                                        case 0:
-                                            shareBook(SearchResultActivity.this, bookCallNumber, bookName);
-                                            break;
-                                        case 1:
-                                            bookListDAO.insertBook(bookID, bookName, bookAuthor, bookPublisher, bookCallNumber);
-                                            Toast.makeText(getApplicationContext(), "已保存", Toast.LENGTH_SHORT).show();
-                                            break;
+                    try {
+                        new MaterialDialog.Builder(SearchResultActivity.this)
+                                .title("选择功能")
+                                .items(R.array.search_function)
+                                .itemsCallback(new MaterialDialog.ListCallback() {
+                                    @Override
+                                    public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                        switch (which) {
+                                            case 0:
+                                                shareBook(SearchResultActivity.this, bookCallNumber, bookName);
+                                                break;
+                                            case 1:
+                                                bookListDAO.insertBook(bookID, bookName, bookAuthor, bookPublisher, bookCallNumber);
+                                                Toast.makeText(getApplicationContext(), "已保存", Toast.LENGTH_SHORT).show();
+                                                break;
+                                        }
                                     }
-                                }
-                            })
-                            .show();
+                                })
+                                .show();
+                    } catch (MaterialDialog.DialogException e) {
+                        e.printStackTrace();
+                        Log.d("VNA", "弹出窗口出错");
+                    }
                 } else {
                     new MaterialDialog.Builder(SearchResultActivity.this)
                             .title("选择功能")
