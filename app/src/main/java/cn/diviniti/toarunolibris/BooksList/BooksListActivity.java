@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -139,45 +140,49 @@ public class BooksListActivity extends AppCompatActivity implements SwipeBackAct
                 final TextView bookCallNumberView = (TextView) view.findViewById(R.id.book_call_number);
                 final String bookCallNumber = bookCallNumberView.getText().toString();
 
-                new MaterialDialog.Builder(BooksListActivity.this)
-                        .title("选择功能")
-                        .items(R.array.bookslist_function)
-                        .itemsCallback(new MaterialDialog.ListCallback() {
-                            @Override
-                            public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                switch (which) {
-                                    case 0:
-                                        String shareString = "索书号：" + bookCallNumber + "\n" +
-                                                "书名：" + bookName;
-                                        shareBook(BooksListActivity.this, shareString);
-                                        break;
-                                    case 1:
-                                        new MaterialDialog.Builder(BooksListActivity.this)
-                                                .title("删除确认")
-                                                .content("确认删除《" + bookName + "》？")
-                                                .positiveText("是的")
-                                                .negativeText("按错了")
-                                                .callback(new MaterialDialog.ButtonCallback() {
-                                                    @Override
-                                                    public void onPositive(MaterialDialog dialog) {
-                                                        bookListDAO.deleteBook(bookID);
-                                                        swipeRefreshLayout.setRefreshing(true);
-                                                        swipeRefreshLayout.postDelayed(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                loadData();
-                                                                swipeRefreshLayout.setRefreshing(false);
-                                                            }
-                                                        }, 920);
-                                                        Toast.makeText(getApplicationContext(), "已删除", Toast.LENGTH_SHORT).show();
-                                                    }
-                                                })
-                                                .show();
-                                        break;
+                try {
+                    new MaterialDialog.Builder(BooksListActivity.this)
+                            .title("选择功能")
+                            .items(R.array.bookslist_function)
+                            .itemsCallback(new MaterialDialog.ListCallback() {
+                                @Override
+                                public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                    switch (which) {
+                                        case 0:
+                                            String shareString = "索书号：" + bookCallNumber + "\n" +
+                                                    "书名：" + bookName;
+                                            shareBook(BooksListActivity.this, shareString);
+                                            break;
+                                        case 1:
+                                            new MaterialDialog.Builder(BooksListActivity.this)
+                                                    .title("删除确认")
+                                                    .content("确认删除《" + bookName + "》？")
+                                                    .positiveText("是的")
+                                                    .negativeText("按错了")
+                                                    .callback(new MaterialDialog.ButtonCallback() {
+                                                        @Override
+                                                        public void onPositive(MaterialDialog dialog) {
+                                                            bookListDAO.deleteBook(bookID);
+                                                            swipeRefreshLayout.setRefreshing(true);
+                                                            swipeRefreshLayout.postDelayed(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    loadData();
+                                                                    swipeRefreshLayout.setRefreshing(false);
+                                                                }
+                                                            }, 920);
+                                                            Toast.makeText(getApplicationContext(), "已删除", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    })
+                                                    .show();
+                                            break;
+                                    }
                                 }
-                            }
-                        })
-                        .show();
+                            })
+                            .show();
+                } catch (MaterialDialog.DialogException e) {
+                    Log.d("VNA", "列表弹出dialog出现异常");
+                }
             }
         }));
     }
