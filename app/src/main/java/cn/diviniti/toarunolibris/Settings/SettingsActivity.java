@@ -320,4 +320,11 @@ public class SettingsActivity extends AppCompatActivity implements SwipeBackActi
             }
         }
     };
+
+    @Override
+    public void startActivity(Intent intent) {
+        super.startActivity(intent);
+        overridePendingTransition(R.anim.enter_righttoleft, R.anim.exit_righttoleft);
+    }
+
 }

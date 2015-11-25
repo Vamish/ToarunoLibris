@@ -1,1 +1,1 @@
-include ':app', ':activation-1.1', ':additionnal-1.1', ':mail-1.0'
+include ':app', ':activation-1.1', ':additionnal-1.1', ':mail-1.0', ':libammsdk'

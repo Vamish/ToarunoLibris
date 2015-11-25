@@ -81,8 +81,8 @@ public class AboutLibrisActivity extends AppCompatActivity implements SwipeBackA
 
     @Override
     protected void onPause() {
-        super.onPause();
         overridePendingTransition(R.anim.enter_lefttoright, R.anim.exit_lefttoright);
+        super.onPause();
     }
 
     private void initSwipeBack() {

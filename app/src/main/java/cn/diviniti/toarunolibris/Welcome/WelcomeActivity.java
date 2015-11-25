@@ -48,7 +48,7 @@ public class WelcomeActivity extends AppCompatActivity {
         String FIRST_LAUNCH = "FIRST_LAUNCH";
         SharedPreferences firstLaunch = getSharedPreferences(FIRST_LAUNCH, MODE_PRIVATE);
         if (Boolean.valueOf(firstLaunch.getBoolean(FIRST_LAUNCH, true))) {
-            Toast.makeText(getApplicationContext(), "送给idea 和所有爱书的人和你。", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "送给idea和所有爱书的人和 你", Toast.LENGTH_LONG).show();
             SharedPreferences.Editor editor = firstLaunch.edit();
             editor.putBoolean(FIRST_LAUNCH, false);
             editor.apply();

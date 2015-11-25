@@ -104,8 +104,9 @@
     <orderEntry type="library" exported="" name="support-annotations-23.0.1" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-23.0.1" level="project" />
     <orderEntry type="library" exported="" name="core-0.8.1.0" level="project" />
-    <orderEntry type="module" module-name="activation-1.1" exported="" />
+    <orderEntry type="module" module-name="libammsdk" exported="" />
     <orderEntry type="module" module-name="mail-1.0" exported="" />
+    <orderEntry type="module" module-name="activation-1.1" exported="" />
     <orderEntry type="module" module-name="additionnal-1.1" exported="" />
     <orderEntry type="library" exported="" name="org.apache.http.legacy-android-23" level="project" />
   </component>

@@ -5,7 +5,6 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -18,7 +17,7 @@ public class LoginUtil {
         this.userPwd = userPwd;
     }
 
-    public String getSession() throws SocketTimeoutException, IOException {
+    public String getSession() throws IOException {
         final String url = "http://libinfo.jmu.edu.cn/cuser/";
 
         final Map<String, String> params = new LinkedHashMap<>();

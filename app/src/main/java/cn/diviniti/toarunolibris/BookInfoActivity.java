@@ -2,6 +2,8 @@ package cn.diviniti.toarunolibris;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -20,14 +22,23 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.tencent.mm.sdk.modelmsg.SendMessageToWX;
+import com.tencent.mm.sdk.modelmsg.WXMediaMessage;
+import com.tencent.mm.sdk.modelmsg.WXWebpageObject;
+import com.tencent.mm.sdk.openapi.IWXAPI;
+import com.tencent.mm.sdk.openapi.WXAPIFactory;
 
 import org.apache.http.HttpHeaders;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +47,8 @@ import java.util.Map;
 import cn.diviniti.toarunolibris.DB.BookListDAO;
 import cn.diviniti.toarunolibris.RecyclerModel.BookInfo;
 import cn.diviniti.toarunolibris.RecyclerModel.BookInfoAdapter;
+import cn.diviniti.toarunolibris.Wechat.Constants;
+import cn.diviniti.toarunolibris.Wechat.Util;
 import me.imid.swipebacklayout.lib.SwipeBackLayout;
 import me.imid.swipebacklayout.lib.Utils;
 import me.imid.swipebacklayout.lib.app.SwipeBackActivityBase;
@@ -63,16 +76,34 @@ public class BookInfoActivity extends AppCompatActivity implements SwipeBackActi
 
     private SwipeBackActivityHelper mHelper;
 
+    private JSONObject shareBook;
+
+    private IWXAPI api;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_info);
+        api = WXAPIFactory.createWXAPI(this, Constants.APP_ID);
         Intent intent = getIntent();
         BOOKID = intent.getExtras().get("bookID").toString();
         BOOK_NAME = intent.getExtras().get("bookName").toString();
         BOOK_AUTHOR = intent.getExtras().get("bookAuthor").toString();
         BOOK_PUBLISHER = intent.getExtras().get("bookPublisher").toString();
         BOOK_CALL_NUMBER = intent.getExtras().get("bookCallNumber").toString();
+
+        //分享的书JSON信息
+        shareBook = new JSONObject();
+        try {
+            shareBook.put("t", BOOK_NAME);  //t:书名
+            shareBook.put("a", BOOK_AUTHOR);    //a:作者
+            shareBook.put("p", BOOK_PUBLISHER); //p:出版社
+            shareBook.put("c", BOOK_CALL_NUMBER);   //c:索书号
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.d("VNA", "BookInfoActivity.class: JSON 基本信息出现错误");
+        }
+
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.book_content);
 
         dialog = new MaterialDialog.Builder(this)
@@ -211,15 +242,86 @@ public class BookInfoActivity extends AppCompatActivity implements SwipeBackActi
         return super.onOptionsItemSelected(item);
     }
 
-    public void shareBook(Context context, String bookCallNum, String bookName) {
-        String shareString = "索书号：" + bookCallNum + "\n" +
-                "书名：" + bookName;
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_SUBJECT, "分享图书信息");
-        intent.putExtra(Intent.EXTRA_TEXT, shareString);
-        intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-        context.startActivity(Intent.createChooser(intent, "分享"));
+    public void shareBook(final Context context, final String bookCallNum, final String bookName) {
+//        String shareString = "索书号：" + bookCallNum + "\n" +
+//                "书名：" + bookName;
+//        String shareString = shareBook.toString();
+        final String shareJson = URLEncoder.encode(shareBook.toString());
+////        Log.d("VNA", shareJson);
+//        Intent intent = new Intent(Intent.ACTION_SEND);
+//        intent.setType("text/html");
+//        intent.putExtra(Intent.EXTRA_SUBJECT, "分享图书信息");
+//        intent.putExtra(Intent.EXTRA_TEXT, "http://toaru.diviniti.cn/Libris/book.html?" + shareJson);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+//        context.startActivity(Intent.createChooser(intent, "分享"));
+//
+//        Uri uri = Uri.parse("http://toaru.diviniti.cn/Libris/book.html?" + shareJson);
+//        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+//        startActivity(intent);
+
+//        api.registerApp(Constants.APP_ID);
+//        Bitmap thumb = BitmapFactory.decodeResource(getResources(), R.drawable.ic_wechat_share);
+//
+//        WXWebpageObject webPage = new WXWebpageObject();
+//        webPage.webpageUrl = "http://toaru.diviniti.cn/Libris/book.html?" + shareJson;
+//
+//        WXMediaMessage msg = new WXMediaMessage(webPage);
+//        msg.title = bookName + " - ToarunoLibris";
+//        msg.description = "来自 愚者の图书馆";
+//        msg.thumbData = Util.bmpToByteArray(thumb, true);
+//
+//        SendMessageToWX.Req req = new SendMessageToWX.Req();
+//        req.transaction = buildTransaction("webpage");
+//        req.scene = SendMessageToWX.Req.WXSceneSession;
+//        req.message = msg;
+//        api.sendReq(req);
+        new MaterialDialog.Builder(BookInfoActivity.this)
+                .title("分享到...")
+                .items(R.array.share_list)
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog materialDialog, View view, int which, CharSequence charSequence) {
+
+                        api.registerApp(Constants.APP_ID);
+                        Bitmap thumb = BitmapFactory.decodeResource(getResources(), R.drawable.ic_wechat_share);
+
+                        WXWebpageObject webPage = new WXWebpageObject();
+                        webPage.webpageUrl = "http://toaru.diviniti.cn/Libris/book.html?" + shareJson;
+
+                        WXMediaMessage msg = new WXMediaMessage(webPage);
+                        msg.title = bookName + " - ToarunoLibris";
+                        msg.description = "来自 愚者の图书馆";
+                        msg.thumbData = Util.bmpToByteArray(thumb, true);
+
+                        SendMessageToWX.Req req = new SendMessageToWX.Req();
+                        req.transaction = buildTransaction("webpage");
+                        req.message = msg;
+                        switch (which) {
+                            case 0:
+                                req.scene = SendMessageToWX.Req.WXSceneTimeline;
+                                api.sendReq(req);
+                                break;
+                            case 1:
+                                req.scene = SendMessageToWX.Req.WXSceneSession;
+                                api.sendReq(req);
+                                break;
+                            case 2:
+                                Intent intent = new Intent(Intent.ACTION_SEND);
+                                intent.setType("text/plain");
+                                String shareString = "索书号：" + bookCallNum + "\n" +
+                                        "书名：" + bookName;
+                                intent.putExtra(Intent.EXTRA_SUBJECT, "分享图书信息");
+                                intent.putExtra(Intent.EXTRA_TEXT, shareString);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                                context.startActivity(Intent.createChooser(intent, "分享"));
+                                break;
+                        }
+                    }
+                }).show();
+    }
+
+    private String buildTransaction(final String type) {
+        return (type == null) ? String.valueOf(System.currentTimeMillis()) : type + System.currentTimeMillis();
     }
 
     public void getAvailableMsg() {
@@ -227,6 +329,7 @@ public class BookInfoActivity extends AppCompatActivity implements SwipeBackActi
         final List<Map<String, String>> bookInfos = new ArrayList<>();
         final String url = "http://smjslib.jmu.edu.cn/bookinfo.aspx?ctrlno=" + BOOKID;
 
+        final JSONArray detailArray = new JSONArray();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -241,6 +344,9 @@ public class BookInfoActivity extends AppCompatActivity implements SwipeBackActi
                     Elements library = libraries.get(libraries.size() - 1).getElementsByTag("tr");
                     for (Element book : library) {
                         Map<String, String> bookInfo = new HashMap<String, String>();
+
+                        //这个JSON存详细信息
+                        JSONObject shareBookDetail = new JSONObject();
                         Log.d(VANGO_DEBUG_BOOK, "==========图书信息==========");
 
                         /*  TODO 每次循环都是第6个左右出现问题
@@ -252,6 +358,7 @@ public class BookInfoActivity extends AppCompatActivity implements SwipeBackActi
                         for (Element e : test) {
                             bookInfo.put("bookStatus", e.text());
                         }
+                        shareBookDetail.put("m", bookInfo.get("bookStatus"));
                         Log.d(VANGO_DEBUG_BOOK, "图书状态：" + bookInfo.get("bookStatus"));
 
                         Elements locations = book.getElementsByIndexEquals(0);
@@ -264,11 +371,14 @@ public class BookInfoActivity extends AppCompatActivity implements SwipeBackActi
                                 bookInfo.put("title", bookInfo.get("bookStatus"));
                             }
                             bookInfo.put("subtitle", location.text());
+                            shareBookDetail.put("l", bookInfo.get("subtitle"));
                         }
                         Log.d(VANGO_DEBUG_BOOK, "藏书地点：" + bookInfo.get("subtitle"));
                         Log.d(VANGO_DEBUG_BOOK, "==========E  N  D==========");
                         bookInfos.add(bookInfo);
+                        detailArray.put(shareBookDetail);
                     }
+                    shareBook.put("s", detailArray);
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -297,6 +407,8 @@ public class BookInfoActivity extends AppCompatActivity implements SwipeBackActi
                             dialog.dismiss();
                         }
                     });
+                    e.printStackTrace();
+                } catch (JSONException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();

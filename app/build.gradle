@@ -11,7 +11,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 23
         versionCode 0
-        versionName "0.9.7.1"
+        versionName "0.9.7.3"
     }
     buildTypes {
         release {
@@ -46,4 +46,5 @@ dependencies {
     compile project(':activation-1.1')
     compile project(':additionnal-1.1')
     compile project(':mail-1.0')
+    compile project(':libammsdk')
 }

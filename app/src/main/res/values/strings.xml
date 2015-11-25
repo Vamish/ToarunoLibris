@@ -54,6 +54,11 @@
         <item>分享</item>
         <item>删除</item>
     </string-array>
+    <string-array name="share_list">
+        <item>朋友圈</item>
+        <item>微信好友</item>
+        <item>其他</item>
+    </string-array>
 
     <string name="open_source_wasabeef">Copyright 2015 Wasabeef
 
